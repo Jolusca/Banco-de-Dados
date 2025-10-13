@@ -1,0 +1,264 @@
+\documentclass[a4paper,12pt]{article}
+
+% Inclui o preâmbulo de um arquivo separado
+\input{preambulo}
+\begin{document}
+
+\begin{center}
+    \textbf{Universidade Federal do Ceará – UFC}\\
+    \textbf{Centro de Ciências – CC}\\
+    \textbf{Departamento de Computação – DC}\\
+    \textbf{Fundamentos de Bancos de Dados}
+\end{center}
+\vspace{0.5cm}
+
+\noindent
+\textbf{Exercício: SQL Introdutório}\\
+\textbf{Objetivo:} Introduzir os principais conceitos da linguagem SQL.\\
+\textbf{Data de entrega:} 14/10/2025
+
+\vspace{0.7cm}
+
+\noindent
+\textbf{NOME:} João Lucas Oliveira Mota\\
+\textbf{MATRÍCULA:} 509597
+
+\vspace{1cm}
+
+\begin{center}
+    \Large\textbf{Lista de Exercícios SQL - Introdutório}
+\end{center}
+
+\vspace{0.5cm}
+
+\section{ Questão}
+Utilizando o PostgreSQL, crie as relações (tabelas) mostradas a seguir. Em seguida, insira as tuplas (linhas) ilustradas nas figuras. Siga o seguinte roteiro:
+\subsection*{a) Identificar o domínio dos atributos, o grau das relações e a diferença entre esquema }
+\subsubsection*{Domínio dos atributos}
+
+\begin{itemize}
+    \item \textbf{Empregado}:
+    \begin{itemize}
+        \item \texttt{ENome}: Texto (\texttt{VARCHAR})
+        \item \texttt{CPF}: Numérico (\texttt{INTEGER} ou \texttt{VARCHAR})
+        \item \texttt{Endereço}: Texto (\texttt{VARCHAR})
+        \item \texttt{Nasc}: Data (\texttt{DATE})
+        \item \texttt{Sexo}: Texto (\texttt{CHAR(1)})
+        \item \texttt{Salário}: Numérico (\texttt{DECIMAL} ou \texttt{FLOAT})
+        \item \texttt{Chefe}: Numérico (\texttt{INTEGER}, referenciando \texttt{CPF})
+        \item \texttt{Cdep}: Numérico (\texttt{INTEGER}, referenciando \texttt{Código} do Departamento)
+    \end{itemize}
+
+    \item \textbf{Departamento}:
+    \begin{itemize}
+        \item \texttt{DNome}: Texto (\texttt{VARCHAR})
+        \item \texttt{Código}: Numérico (\texttt{INTEGER})
+        \item \texttt{Gerente}: Numérico (\texttt{INTEGER}, referenciando \texttt{CPF} do Empregado)
+    \end{itemize}
+
+    \item \textbf{Projeto}:
+    \begin{itemize}
+        \item \texttt{PNome}: Texto (\texttt{VARCHAR})
+        \item \texttt{PCódigo}: Texto (\texttt{VARCHAR})
+        \item \texttt{Cidade}: Texto (\texttt{VARCHAR})
+        \item \texttt{Cdep}: Numérico (\texttt{INTEGER}, referenciando \texttt{Código} do Departamento)
+    \end{itemize}
+
+    \item \textbf{Tarefa}:
+    \begin{itemize}
+        \item \texttt{CPF}: Numérico (\texttt{INTEGER}, referenciando \texttt{CPF} do Empregado)
+        \item \texttt{PCódigo}: Texto (\texttt{VARCHAR}, referenciando \texttt{PCódigo} do Projeto)
+        \item \texttt{Horas}: Numérico (\texttt{DECIMAL} ou \texttt{FLOAT})
+    \end{itemize}
+
+    \item \textbf{DUnidade}:
+    \begin{itemize}
+        \item \texttt{DCódigo}: Numérico (\texttt{INTEGER}, referenciando \texttt{Código} do Departamento)
+        \item \texttt{DCidade}: Texto (\texttt{VARCHAR})
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\subsubsection*{Grau das Relações}
+\begin{itemize}
+    \item \textbf{Empregado}: 8 atributos
+    \item \textbf{Departamento}: 3 atributos
+    \item \textbf{Projeto}: 4 atributos
+    \item \textbf{Tarefa}: 3 atributos
+    \item \textbf{DUnidade}: 2 atributos
+\end{itemize}
+
+\subsubsection*{Esquema de Relação vs. Relação}
+\begin{itemize}
+    \item \textbf{Esquema de relação}: Define a estrutura da tabela (nomes dos atributos e seus domínios).\\
+    Exemplo: \texttt{Empregado(ENome, CPF, Endereço, Nasc, Sexo, Salário, Chefe, Cdep)}.
+    \item \textbf{Relação}: Conjunto de tuplas (linhas) que obedecem ao esquema. \\
+    Exemplo: A tabela \texttt{Empregado} com os dados inseridos.
+\end{itemize}
+
+\subsection*{b) Identificar as chaves candidatas, a chave primária e as chaves estrangeiras para cada relação.}
+
+\subsubsection*{Empregado}
+\begin{itemize}
+    \item \textbf{Chaves candidatas}: \texttt{CPF} (único para cada empregado).
+    \item \textbf{Chave primária}: \texttt{CPF}.
+    \item \textbf{Chaves estrangeiras}: \texttt{Chefe} (referencia \texttt{CPF} em \texttt{Empregado}), \texttt{Cdep} (referencia \texttt{Código} em \texttt{Departamento}).
+\end{itemize}
+
+\subsubsection*{Departamento}
+\begin{itemize}
+    \item \textbf{Chaves candidatas}: \texttt{Código} (único para cada departamento).
+    \item \textbf{Chave primária}: \texttt{Código}.
+    \item \textbf{Chaves estrangeiras}: \texttt{Gerente} (referencia \texttt{CPF} em \texttt{Empregado}).
+\end{itemize}
+
+\subsubsection*{Projeto}
+\begin{itemize}
+    \item \textbf{Chaves candidatas}: \texttt{PCódigo} (único para cada projeto).
+    \item \textbf{Chave primária}: \texttt{PCódigo}.
+    \item \textbf{Chaves estrangeiras}: \texttt{Cdep} (referencia \texttt{Código} em \texttt{Departamento}).
+\end{itemize}
+
+\subsubsection*{Tarefa}
+\begin{itemize}
+    \item \textbf{Chaves candidatas}: \texttt{(CPF, PCódigo)} (combinados, únicos para cada tarefa).
+    \item \textbf{Chave primária}: \texttt{(CPF, PCódigo)}.
+    \item \textbf{Chaves estrangeiras}: \texttt{CPF} (referencia \texttt{CPF} em \texttt{Empregado}), \texttt{PCódigo} (referencia \texttt{PCódigo} em \texttt{Projeto}).
+\end{itemize}
+
+\subsubsection*{DUnidade}
+\begin{itemize}
+    \item \textbf{Chaves candidatas}: \texttt{(DCódigo, DCidade)} (combinados, únicos para cada unidade).
+    \item \textbf{Chave primária}: \texttt{(DCódigo, DCidade)}.
+    \item \textbf{Chaves estrangeiras}: \texttt{DCódigo} (referencia \texttt{Código} em \texttt{Departamento}).
+\end{itemize}
+
+\subsection*{c) Criar um \textit{Database} para o esquema acima (usar a interface do PostgreSQL).}
+Os comandos para criar o banco de dados estão presentes no código Q1.
+
+\subsection*{d) Criar as relações mostradas no esquema acima.}
+Os comandos para criar as tabelas estão presentes no código Q1.
+
+\subsection*{e) Povoar as relações.}
+Os comandos para inserir os dados nas tabelas estão presentes no código Q1.
+
+\subsubsection*{Empregado}
+\begin{table}[h]
+\centering
+\caption{Tabela Empregado}
+\begin{tabular}{|l|l|l|l|l|l|l|l|}
+\hline
+\textbf{ENome}   & \textbf{CPF} & \textbf{Endereço} & \textbf{Nasc}   & \textbf{Sexo} & \textbf{Salário} & \textbf{Chefe} & \textbf{Cdep} \\ \hline
+Chiquin          & 1234         & rua 1, 1          & 02/02/62        & M             & 10000,00       & 8765          & 3            \\ \hline
+Helenita         & 4321         & rua 2, 2          & 03/03/63        & F             & 12000,00       & 6543          & 2            \\ \hline
+Pedrin           & 5678         & rua 3, 3          & 04/04/64        & M             & 9000,00        & 6543          & 2            \\ \hline
+Valtin           & 8765         & rua 4, 4          & 05/05/65        & M             & 15000,00       & Null          & 4            \\ \hline
+Zulmira          & 3456         & rua 5, 5          & 06/06/66        & F             & 12000,00       & 8765          & 3            \\ \hline
+Zefinha          & 6543         & rua 6, 6          & 07/07/67        & F             & 10000,00       & 8765          & 2            \\ \hline
+\end{tabular}
+\end{table}
+
+
+\subsubsection*{Departamento}
+\begin{table}[h]
+\centering
+\caption{Tabela Departamento}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{DNome}      & \textbf{Código} & \textbf{Gerente} \\ \hline
+Pesquisa           & 3               & 1234             \\ \hline
+Marketing          & 2               & 6543             \\ \hline
+Administração      & 4               & 8765             \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection*{Projeto}
+\begin{table}[h]
+\centering
+\caption{Tabela Projeto}
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{PNome}         & \textbf{PCódigo} & \textbf{Cidade}   & \textbf{Cdep} \\ \hline
+ProdutoA              & PA               & Cumbuco          & 3            \\ \hline
+ProdutoB              & PB               & Icapuí           & 3            \\ \hline
+Informatização        & Inf              & Fortaleza        & 4            \\ \hline
+Divulgação            & Div              & Morro Branco     & 2            \\ \hline
+\end{tabular}
+\end{table}
+
+
+\subsubsection*{Tarefa}
+\begin{table}[h]
+\centering
+\caption{Tabela Tarefa}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{CPF} & \textbf{PCódigo} & \textbf{Horas} \\ \hline
+1234         & PA               & 30.0            \\ \hline
+1234         & PB               & 10.0            \\ \hline
+4321         & PA               & 5.0             \\ \hline
+4321         & Div              & 35.0            \\ \hline
+5678         & Div              & 40.0            \\ \hline
+8765         & Inf              & 32.0            \\ \hline
+8765         & Div              & 8.0             \\ \hline
+3456         & PA               & 10.0            \\ \hline
+3456         & PB               & 25.0            \\ \hline
+3456         & Div              & 5.0             \\ \hline
+6543         & PB               & 40.0            \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection*{DUnidade}
+\begin{table}[h]
+\centering
+\caption{Tabela DUnidade}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{DCódigo} & \textbf{DCidade} \\ \hline
+2                & Morro Branco     \\ \hline
+3                & Cumbuco          \\ \hline
+3                & Prainha          \\ \hline
+3                & Taíba            \\ \hline
+3                & Icapuí           \\ \hline
+4                & Fortaleza        \\ \hline
+\end{tabular}
+\end{table}
+
+
+\vspace{1cm}
+
+\section{ Questão}
+Utilize a linguagem de consulta SQL e recupere as informações solicitadas a seguir:
+\begin{enumerate}[label=\alph*)]
+    \item Recupere o nome e o salário de todos os empregados que trabalham em Marketing.
+    \item Recupere o CPF de todos os empregados que trabalham em Pesquisa ou que diretamente gerenciam um empregado que trabalha em Pesquisa.
+    \item Recupere o nome e a cidade dos projetos que envolvem (contêm) pelo menos um empregado que trabalha mais de 30 horas nesse projeto.
+    \item Recupere o nome e a data de nascimento dos gerentes de cada departamento.
+    \item Recupere o nome e o endereço de todos os empregados que trabalham para o departamento “Pesquisa”.
+    \item Para cada projeto localizado em Icapuí, recupere o código do projeto, o nome do departamento que o controla e o nome do seu gerente.
+    \item Recupere o nome e o sexo dos empregados que não são gerentes.
+\end{enumerate}
+\subsubsection*{Resposta:}
+O código para as respostas dessa Questão está no arquivo anexado Q2.
+\vspace{1cm}
+
+\begin{flushright}
+\textit{“A leitura do mundo precede a leitura da palavra.”}\\
+Paulo Freire
+\end{flushright}
+
+\newpage
+\section{Códigos SQL Anexados}
+\subsection{Questão 1}
+\lstinputlisting[
+    caption={Consultas SQL: Questão 1},
+    label=lst:consultas,
+]{q1.sql}
+\newpage
+\subsection{Questão 2}
+\lstinputlisting[
+    caption={Consultas SQL: Questão 2},
+    label=lst:consultas,
+]{q2.sql}
+
+\end{document}

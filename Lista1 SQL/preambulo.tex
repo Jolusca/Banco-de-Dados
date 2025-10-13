@@ -1,0 +1,31 @@
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{tabularx}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{setspace}
+\usepackage{enumitem}
+\usepackage{booktabs} % Para linhas mais bonitas nas tabelas
+\usepackage{array}    % Para controle de colunas
+\usepackage{listings} % Para inclusão de código
+\usepackage{xcolor}   % Para cores no código
+\usepackage{graphicx} % Para inclusão de imagens (opcional)
+
+% Configuração para código SQL
+\lstset{
+    language=SQL,
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    captionpos=b,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!50!black},
+    stringstyle=\color{red},
+    showstringspaces=false,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    escapeinside={(*@}{@*)},
+    morekeywords={JOIN, INNER, LEFT, RIGHT, FULL, CROSS, NATURAL, ON, WHERE, GROUP, HAVING, AVG, SUM, DISTINCT, BETWEEN, IN, NOT, AND, OR, AS, FROM, SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, TABLE, DATABASE, INTO, VALUES, SET, PRIMARY, KEY, FOREIGN, REFERENCES}
+}
+
+\setstretch{1.2}

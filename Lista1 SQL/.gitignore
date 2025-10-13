@@ -1,0 +1,40 @@
+# Arquivos temporários do LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.pdf
+*.bbl
+*.blg
+*.lof
+*.lot
+*.lol
+*.idx
+*.ind
+*.ilg
+*.nav
+*.snm
+*.vrb
+*.dvi
+*.ps
+*.loa
+
+# Arquivos temporários do VSCode
+.vscode/
+*.code-workspace
+
+# Arquivos de backup do VSCode
+*.bak
+
+# Arquivos de configuração local do LaTeX (gerados pelo latexmk)
+.latexmkrc
+
+# Arquivos de cache do VSCode LaTeX Workshop
+.out/
+
+# Arquivos de configuração do editor
+*.swp
+*.swo
