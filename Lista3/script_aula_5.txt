@@ -10,7 +10,7 @@ SET salario = 2500
 WHERE matr = 1
 
 UPDATE eempresa.empregado
-SET lotação = 1
+SET cdep = 1
 WHERE matr = 3
 
 SELECT e.enome, e.salario 
@@ -42,15 +42,15 @@ LIMIT 2
 
 -- Listar nome dos departamentos com média salarial maior que a
 --média salarial da empresa
-SELECT d."DNome", avg("salario")
+SELECT d."dnome", avg("salario")
 FROM eempresa.departamento d, eempresa.empregado e
-WHERE d."Codigo"=e."CDep"
-GROUP BY d."DNome"
+WHERE d."codigo"=e."cdep"
+GROUP BY d."dnome"
 HAVING AVG(e."salario") > (SELECT AVG("salario") FROM eempresa.empregado)
 
 SELECT d.dnome
 FROM eempresa.departamento d, eempresa.empregado e
-WHERE d.codigo=e.lotação
+WHERE d.codigo=e.cdep
 GROUP BY d.codigo
 HAVING AVG(e.salario) > (SELECT AVG(salario) FROM eempresa.empregado)
 
@@ -63,17 +63,17 @@ FROM eempresa.empregado e1
 WHERE e1.salario > (
                     SELECT AVG(salario) 
                     FROM  eempresa.empregado e2 
-		   			WHERE e2.lotação=e1.lotação
+		   			WHERE e2.cdep=e1.cdep
                     )
 
 SELECT *
 FROM eempresa.empregado e, eempresa.departamento d
-WHERE e.lotação = d.codigo
+WHERE e.cdep = d.codigo
 
 -- IN
-SELECT "ENome" 
+SELECT "enome" 
 FROM eempresa.empregado e
-WHERE e."CPF" in ('1234','6543','4321')
+WHERE e."cpf" in ('1234','6543','4321')
 
 SELECT *
 FROM eempresa.empregado
@@ -89,12 +89,12 @@ INSERT INTO eempresa.dunidade VALUES (2,'Fortaleza')
 -- Listar os empregados lotados nos departamentos que possuem 
 --uma unidade localizada em Fortaleza
 EXPLAIN
-SELECT "ENome" 
+SELECT "enome" 
 FROM eempresa.empregado 
-WHERE "CDep" IN (
-                  SELECT "Codigo" 
+WHERE "cdep" IN (
+                  SELECT "codigo" 
                   FROM eempresa.departamento d, eempresa.dunidade du
-    			  WHERE d."Codigo" = du."DCodigo" AND du."DCidade"='Fortaleza'
+    			  WHERE d."codigo" = du."Dcodigo" AND du."DCidade"='Fortaleza'
                 )
 
 EXPLAIN
@@ -104,17 +104,17 @@ WHERE e.cdep = d.codigo AND d.codigo = du.dcodigo AND du.dcidade='Fortaleza'
 
 -- Listar os empregados lotados nos departamentos que possuem unidades 
 -- em Fortaleza ou Cumbuco
-SELECT "ENome" 
+SELECT "enome" 
 FROM eempresa.empregado 
-WHERE "CDep" IN (
-                  SELECT "Codigo" 
+WHERE "cdep" IN (
+                  SELECT "codigo" 
                   FROM eempresa.departamento d, eempresa.dunidade du
-    			  WHERE d."Codigo" = du."DCodigo" AND (du."DCidade"='Fortaleza' OR du."DCidade"='Cumbuco')
+    			  WHERE d."codigo" = du."Dcodigo" AND (du."DCidade"='Fortaleza' OR du."DCidade"='Cumbuco')
                 )
 
-SELECT "ENome" 
+SELECT "enome" 
 FROM eempresa.empregado e, eempresa.departamento d, eempresa.dunidade du
-WHERE e."CDep" = d."Codigo" AND d."Codigo" = du."DCodigo" AND (du."DCidade"='Fortaleza' OR du."DCidade"='Cumbuco')  
+WHERE e."cdep" = d."codigo" AND d."codigo" = du."Dcodigo" AND (du."DCidade"='Fortaleza' OR du."DCidade"='Cumbuco')  
 
 SELECT enome 
 FROM eempresa.empregado 
@@ -129,19 +129,19 @@ WHERE e.cdep = d.codigo AND d.codigo = du.dcodigo AND (du.dcidade='Fortaleza' OR
 
 -- Listar empregados que ganham salários maior ou igual 
 -- a média salarial de algum departamento
-SELECT "ENome", "salario" 
+SELECT "enome", "salario" 
 FROM eempresa.empregado 
 WHERE "salario" >= SOME (	SELECT AVG("salario") 
                        		FROM  eempresa.empregado   
-		 			   		GROUP BY "CDep"
+		 			   		GROUP BY "cdep"
                        	)
 						
 						
-SELECT "ENome", "salario" 
+SELECT "enome", "salario" 
 FROM eempresa.empregado 
 WHERE "salario" >= ANY (	SELECT AVG("salario") 
                        		FROM  eempresa.empregado   
-		 			   		GROUP BY "CDep"
+		 			   		GROUP BY "cdep"
                        	)						
 						
 SELECT enome 
@@ -151,12 +151,12 @@ WHERE salario >= ANY (SELECT AVG(salario)
 		 			   GROUP BY cdep
                        )
 
-SELECT "ENome" 
+SELECT "enome" 
 FROM eempresa.empregado 
 WHERE "salario" >= (SELECT MIN(media) 
                  	FROM  (	SELECT AVG("salario") AS media
                        		FROM  eempresa.empregado   
-		 			   		GROUP BY "CDep"
+		 			   		GROUP BY "cdep"
                       	) AS tab    
                  )
                        
@@ -170,31 +170,31 @@ WHERE salario >= ALL (
                          GROUP BY cdep
                        )
 					   
-SELECT "ENome", "salario" 
+SELECT "enome", "salario" 
 FROM eempresa.empregado 
 WHERE "salario" >= ALL (	SELECT AVG("salario") 
                        		FROM  eempresa.empregado   
-		 			   		GROUP BY "CDep"
+		 			   		GROUP BY "cdep"
                        	)	
 						
-SELECT "ENome" 
+SELECT "enome" 
 FROM eempresa.empregado 
 WHERE "salario" >= (SELECT MAX(media) 
                  	FROM  (	SELECT AVG("salario") AS media
                        		FROM  eempresa.empregado   
-		 			   		GROUP BY "CDep"
+		 			   		GROUP BY "cdep"
                       	) AS tab    
                  )						
                        
 -- Listar o departamento com maior média salarial
-SELECT d."DNome", AVG("salario")
+SELECT d."dnome", AVG("salario")
 FROM eempresa.empregado e, eempresa.departamento  d
-WHERE e."CDep" = d."Codigo"
-GROUP BY d."DNome"
+WHERE e."cdep" = d."codigo"
+GROUP BY d."dnome"
 HAVING AVG("salario") >= ALL (
                               SELECT AVG("salario") 
                               FROM eempresa.empregado  
-		 	       			  GROUP BY "CDep"
+		 	       			  GROUP BY "cdep"
                             )
 
 SELECT * FROM eempresa.departamento
@@ -214,7 +214,7 @@ CREATE TABLE eempresa.dependente (
 );
 ALTER TABLE eempresa.dependente add CONSTRAINT pk_dependente PRIMARY KEY ("cpf_resp","nome");
 
-ALTER TABLE eempresa.dependente add CONSTRAINT fk_dependente_empregado FOREIGN KEY ("cpf_resp") REFERENCES eempresa.empregado("CPF");
+ALTER TABLE eempresa.dependente add CONSTRAINT fk_dependente_empregado FOREIGN KEY ("cpf_resp") REFERENCES eempresa.empregado("cpf");
 
 SELECT * FROM eempresa.empregado
 																		  
@@ -236,9 +236,9 @@ FROM eempresa.dependente dep
 
 1)
 EXPLAIN
-SELECT e."ENome"
+SELECT e."enome"
 FROM eempresa.empregado e 
-WHERE e."CPF" IN (
+WHERE e."cpf" IN (
 	SELECT DISTINCT "cpf_resp"
 	FROM eempresa.dependente dep
 )
@@ -246,28 +246,28 @@ WHERE e."CPF" IN (
 2)
 
 EXPLAIN
-SELECT e."ENome"
+SELECT e."enome"
 FROM eempresa.empregado e, (
 		SELECT DISTINCT "cpf_resp"
 		FROM eempresa.dependente dep
 	) AS tab
-WHERE e."CPF" = tab."cpf_resp"
+WHERE e."cpf" = tab."cpf_resp"
 
 3)
 EXPLAIN
-SELECT e."ENome" 
+SELECT e."enome" 
 FROM eempresa.empregado e
 WHERE EXISTS (
                 SELECT * 
     			FROM eempresa.dependente d
-                WHERE d.cpf_resp=e."CPF"
+                WHERE d.cpf_resp=e."cpf"
               )
 4)
 
 EXPLAIN
-SELECT DISTINCT e."ENome" 
+SELECT DISTINCT e."enome" 
 FROM eempresa.empregado e, eempresa.dependente d
-WHERE e."CPF" = d.cpf_resp
+WHERE e."cpf" = d.cpf_resp
 
 ------------
 
@@ -302,16 +302,16 @@ WHERE e.cpf IN (SELECT d.cpf_resp FROM eempresa.dependente d)
 -- Listar empregados que NÃO possuem dependentes 
 1)
 EXPLAIN
-SELECT e."ENome" 
+SELECT e."enome" 
 FROM eempresa.empregado e
-WHERE e."CPF" NOT IN (SELECT d.cpf_resp FROM eempresa.dependente d)
+WHERE e."cpf" NOT IN (SELECT d.cpf_resp FROM eempresa.dependente d)
 
 2)
 EXPLAIN
-SELECT e."ENome" 
+SELECT e."enome" 
 from eempresa.empregado e
 WHERE NOT EXISTS (
-	SELECT * FROM eempresa.dependente d WHERE d.cpf_resp=e."CPF"
+	SELECT * FROM eempresa.dependente d WHERE d.cpf_resp=e."cpf"
 )
 
 -- Listar nome de departamentos com empregados ganhando duas vezes mais 
@@ -319,30 +319,30 @@ WHERE NOT EXISTS (
 
 SELECT * FROM eempresa.empregado
 																		  
-UPDATE eempresa.empregado SET "salario" = 50000 WHERE "CPF"='4321'
+UPDATE eempresa.empregado SET "salario" = 50000 WHERE "cpf"='4321'
 																		  
 SELECT * FROM eempresa.empregado where cdep=2
 
 1)
-SELECT d."DNome"
+SELECT d."dnome"
 FROM eempresa.departamento d
 WHERE EXISTS (SELECT * FROM eempresa.empregado e
-                       WHERE e."CDep"=d."Codigo" AND
+                       WHERE e."cdep"=d."codigo" AND
 		      				 "salario" > (2*(SELECT AVG("salario") 
                                            FROM eempresa.empregado e2
-										   WHERE e2."CDep"=e."CDep"
+										   WHERE e2."cdep"=e."cdep"
                                           )
                							)
              )
 			 
 2)
-SELECT DISTINCT d."DNome"
+SELECT DISTINCT d."dnome"
 FROM empregado e2, departamento d(
-	SELECT e."CDep", AVG("salario") as media 
+	SELECT e."cdep", AVG("salario") as media 
 	FROM eempresa.empregado e
-	GROUP BY e."CDep"
+	GROUP BY e."cdep"
 ) AS tab
-WHERE e2."CDep" = tab."CDep" AND e2."CDep" = d."Codigo"
+WHERE e2."cdep" = tab."cdep" AND e2."cdep" = d."codigo"
 AND e2."salario" > 2*tab.media
 
 					
