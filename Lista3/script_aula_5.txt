@@ -23,30 +23,30 @@ WHERE salario > (SELECT salario FROM eempresa.empregado)
 
 -- Listar o primeiro e segundo maiores salários da empresa
 EXPLAIN
-SELECT MAX("Salario")
+SELECT MAX("salario")
 FROM eempresa.empregado
 UNION
-SELECT MAX("Salario")
+SELECT MAX("salario")
 FROM eempresa.empregado 
-WHERE "Salario" <> (SELECT MAX("Salario") FROM eempresa.empregado)
+WHERE "salario" <> (SELECT MAX("salario") FROM eempresa.empregado)
 
-SELECT DISTINCT "Salario"
+SELECT DISTINCT "salario"
 FROM eempresa.empregado
-ORDER BY "Salario" DESC
+ORDER BY "salario" DESC
 
 EXPLAIN
-SELECT DISTINCT "Salario" 
+SELECT DISTINCT "salario" 
 FROM eempresa.empregado
-ORDER BY "Salario" DESC
+ORDER BY "salario" DESC
 LIMIT 2
 
 -- Listar nome dos departamentos com média salarial maior que a
 --média salarial da empresa
-SELECT d."DNome", avg("Salario")
+SELECT d."DNome", avg("salario")
 FROM eempresa.departamento d, eempresa.empregado e
 WHERE d."Codigo"=e."CDep"
 GROUP BY d."DNome"
-HAVING AVG(e."Salario") > (SELECT AVG("Salario") FROM eempresa.empregado)
+HAVING AVG(e."salario") > (SELECT AVG("salario") FROM eempresa.empregado)
 
 SELECT d.dnome
 FROM eempresa.departamento d, eempresa.empregado e
@@ -129,17 +129,17 @@ WHERE e.cdep = d.codigo AND d.codigo = du.dcodigo AND (du.dcidade='Fortaleza' OR
 
 -- Listar empregados que ganham salários maior ou igual 
 -- a média salarial de algum departamento
-SELECT "ENome", "Salario" 
+SELECT "ENome", "salario" 
 FROM eempresa.empregado 
-WHERE "Salario" >= SOME (	SELECT AVG("Salario") 
+WHERE "salario" >= SOME (	SELECT AVG("salario") 
                        		FROM  eempresa.empregado   
 		 			   		GROUP BY "CDep"
                        	)
 						
 						
-SELECT "ENome", "Salario" 
+SELECT "ENome", "salario" 
 FROM eempresa.empregado 
-WHERE "Salario" >= ANY (	SELECT AVG("Salario") 
+WHERE "salario" >= ANY (	SELECT AVG("salario") 
                        		FROM  eempresa.empregado   
 		 			   		GROUP BY "CDep"
                        	)						
@@ -153,8 +153,8 @@ WHERE salario >= ANY (SELECT AVG(salario)
 
 SELECT "ENome" 
 FROM eempresa.empregado 
-WHERE "Salario" >= (SELECT MIN(media) 
-                 	FROM  (	SELECT AVG("Salario") AS media
+WHERE "salario" >= (SELECT MIN(media) 
+                 	FROM  (	SELECT AVG("salario") AS media
                        		FROM  eempresa.empregado   
 		 			   		GROUP BY "CDep"
                       	) AS tab    
@@ -170,29 +170,29 @@ WHERE salario >= ALL (
                          GROUP BY cdep
                        )
 					   
-SELECT "ENome", "Salario" 
+SELECT "ENome", "salario" 
 FROM eempresa.empregado 
-WHERE "Salario" >= ALL (	SELECT AVG("Salario") 
+WHERE "salario" >= ALL (	SELECT AVG("salario") 
                        		FROM  eempresa.empregado   
 		 			   		GROUP BY "CDep"
                        	)	
 						
 SELECT "ENome" 
 FROM eempresa.empregado 
-WHERE "Salario" >= (SELECT MAX(media) 
-                 	FROM  (	SELECT AVG("Salario") AS media
+WHERE "salario" >= (SELECT MAX(media) 
+                 	FROM  (	SELECT AVG("salario") AS media
                        		FROM  eempresa.empregado   
 		 			   		GROUP BY "CDep"
                       	) AS tab    
                  )						
                        
 -- Listar o departamento com maior média salarial
-SELECT d."DNome", AVG("Salario")
+SELECT d."DNome", AVG("salario")
 FROM eempresa.empregado e, eempresa.departamento  d
 WHERE e."CDep" = d."Codigo"
 GROUP BY d."DNome"
-HAVING AVG("Salario") >= ALL (
-                              SELECT AVG("Salario") 
+HAVING AVG("salario") >= ALL (
+                              SELECT AVG("salario") 
                               FROM eempresa.empregado  
 		 	       			  GROUP BY "CDep"
                             )
@@ -319,7 +319,7 @@ WHERE NOT EXISTS (
 
 SELECT * FROM eempresa.empregado
 																		  
-UPDATE eempresa.empregado SET "Salario" = 50000 WHERE "CPF"='4321'
+UPDATE eempresa.empregado SET "salario" = 50000 WHERE "CPF"='4321'
 																		  
 SELECT * FROM eempresa.empregado where cdep=2
 
@@ -328,7 +328,7 @@ SELECT d."DNome"
 FROM eempresa.departamento d
 WHERE EXISTS (SELECT * FROM eempresa.empregado e
                        WHERE e."CDep"=d."Codigo" AND
-		      				 "Salario" > (2*(SELECT AVG("Salario") 
+		      				 "salario" > (2*(SELECT AVG("salario") 
                                            FROM eempresa.empregado e2
 										   WHERE e2."CDep"=e."CDep"
                                           )
@@ -338,12 +338,12 @@ WHERE EXISTS (SELECT * FROM eempresa.empregado e
 2)
 SELECT DISTINCT d."DNome"
 FROM empregado e2, departamento d(
-	SELECT e."CDep", AVG("Salario") as media 
+	SELECT e."CDep", AVG("salario") as media 
 	FROM eempresa.empregado e
 	GROUP BY e."CDep"
 ) AS tab
 WHERE e2."CDep" = tab."CDep" AND e2."CDep" = d."Codigo"
-AND e2."Salario" > 2*tab.media
+AND e2."salario" > 2*tab.media
 
 					
 SELECT e1.enome as empregado, e2.enome as chefe
