@@ -1,0 +1,538 @@
+-- SCRIPT AULA 5
+
+-- Listar todos os empregados que têm salário maior que a média salarial da empresa
+
+SELECT *
+FROM eempresa.empregado
+
+UPDATE eempresa.empregado
+SET salario = 2500
+WHERE matr = 1
+
+UPDATE eempresa.empregado
+SET lotação = 1
+WHERE matr = 3
+
+SELECT e.enome, e.salario 
+FROM eempresa.empregado e
+WHERE salario > (SELECT AVG(salario) FROM eempresa.empregado)
+
+SELECT e.enome, e.salario 
+FROM eempresa.empregado e
+WHERE salario > (SELECT salario FROM eempresa.empregado)
+
+-- Listar o primeiro e segundo maiores salários da empresa
+EXPLAIN
+SELECT MAX("Salario")
+FROM eempresa.empregado
+UNION
+SELECT MAX("Salario")
+FROM eempresa.empregado 
+WHERE "Salario" <> (SELECT MAX("Salario") FROM eempresa.empregado)
+
+SELECT DISTINCT "Salario"
+FROM eempresa.empregado
+ORDER BY "Salario" DESC
+
+EXPLAIN
+SELECT DISTINCT "Salario" 
+FROM eempresa.empregado
+ORDER BY "Salario" DESC
+LIMIT 2
+
+-- Listar nome dos departamentos com média salarial maior que a
+--média salarial da empresa
+SELECT d."DNome", avg("Salario")
+FROM eempresa.departamento d, eempresa.empregado e
+WHERE d."Codigo"=e."CDep"
+GROUP BY d."DNome"
+HAVING AVG(e."Salario") > (SELECT AVG("Salario") FROM eempresa.empregado)
+
+SELECT d.dnome
+FROM eempresa.departamento d, eempresa.empregado e
+WHERE d.codigo=e.lotação
+GROUP BY d.codigo
+HAVING AVG(e.salario) > (SELECT AVG(salario) FROM eempresa.empregado)
+
+
+-- Listar todos os empregado que possuem salário maior que a 
+-- média salarial de seus departamentos
+EXPLAIN
+SELECT e1.enome 
+FROM eempresa.empregado e1
+WHERE e1.salario > (
+                    SELECT AVG(salario) 
+                    FROM  eempresa.empregado e2 
+		   			WHERE e2.lotação=e1.lotação
+                    )
+
+SELECT *
+FROM eempresa.empregado e, eempresa.departamento d
+WHERE e.lotação = d.codigo
+
+-- IN
+SELECT "ENome" 
+FROM eempresa.empregado e
+WHERE e."CPF" in ('1234','6543','4321')
+
+SELECT *
+FROM eempresa.empregado
+
+SELECT *
+FROM eempresa.departamento
+
+SELECT *
+FROM eempresa.dunidade
+
+INSERT INTO eempresa.dunidade VALUES (2,'Fortaleza')
+
+-- Listar os empregados lotados nos departamentos que possuem 
+--uma unidade localizada em Fortaleza
+EXPLAIN
+SELECT "ENome" 
+FROM eempresa.empregado 
+WHERE "CDep" IN (
+                  SELECT "Codigo" 
+                  FROM eempresa.departamento d, eempresa.dunidade du
+    			  WHERE d."Codigo" = du."DCodigo" AND du."DCidade"='Fortaleza'
+                )
+
+EXPLAIN
+SELECT enome 
+FROM eempresa.empregado e, eempresa.departamento d, eempresa.dunidade du
+WHERE e.cdep = d.codigo AND d.codigo = du.dcodigo AND du.dcidade='Fortaleza'    
+
+-- Listar os empregados lotados nos departamentos que possuem unidades 
+-- em Fortaleza ou Cumbuco
+SELECT "ENome" 
+FROM eempresa.empregado 
+WHERE "CDep" IN (
+                  SELECT "Codigo" 
+                  FROM eempresa.departamento d, eempresa.dunidade du
+    			  WHERE d."Codigo" = du."DCodigo" AND (du."DCidade"='Fortaleza' OR du."DCidade"='Cumbuco')
+                )
+
+SELECT "ENome" 
+FROM eempresa.empregado e, eempresa.departamento d, eempresa.dunidade du
+WHERE e."CDep" = d."Codigo" AND d."Codigo" = du."DCodigo" AND (du."DCidade"='Fortaleza' OR du."DCidade"='Cumbuco')  
+
+SELECT enome 
+FROM eempresa.empregado 
+WHERE cdep IN (
+                  SELECT codigo 
+                  FROM eempresa.departamento d, eempresa.dunidade du
+    			  WHERE d.codigo = du.dcodigo AND (du.dcidade='Fortaleza' OR du.dcidade='Cumbuco')
+                )
+SELECT enome 
+FROM eempresa.empregado e, eempresa.departamento d, eempresa.dunidade du
+WHERE e.cdep = d.codigo AND d.codigo = du.dcodigo AND (du.dcidade='Fortaleza' OR du.dcidade='Cumbuco')   
+
+-- Listar empregados que ganham salários maior ou igual 
+-- a média salarial de algum departamento
+SELECT "ENome", "Salario" 
+FROM eempresa.empregado 
+WHERE "Salario" >= SOME (	SELECT AVG("Salario") 
+                       		FROM  eempresa.empregado   
+		 			   		GROUP BY "CDep"
+                       	)
+						
+						
+SELECT "ENome", "Salario" 
+FROM eempresa.empregado 
+WHERE "Salario" >= ANY (	SELECT AVG("Salario") 
+                       		FROM  eempresa.empregado   
+		 			   		GROUP BY "CDep"
+                       	)						
+						
+SELECT enome 
+FROM eempresa.empregado 
+WHERE salario >= ANY (SELECT AVG(salario) 
+                       FROM  eempresa.empregado   
+		 			   GROUP BY cdep
+                       )
+
+SELECT "ENome" 
+FROM eempresa.empregado 
+WHERE "Salario" >= (SELECT MIN(media) 
+                 	FROM  (	SELECT AVG("Salario") AS media
+                       		FROM  eempresa.empregado   
+		 			   		GROUP BY "CDep"
+                      	) AS tab    
+                 )
+                       
+-- Listar empregados que ganham salários maior ou igual 
+-- a média salarial de cada departamento
+SELECT enome 
+FROM eempresa.empregado    
+WHERE salario >= ALL (
+                         SELECT AVG(salario) 
+                         FROM eempresa.empregado 
+                         GROUP BY cdep
+                       )
+					   
+SELECT "ENome", "Salario" 
+FROM eempresa.empregado 
+WHERE "Salario" >= ALL (	SELECT AVG("Salario") 
+                       		FROM  eempresa.empregado   
+		 			   		GROUP BY "CDep"
+                       	)	
+						
+SELECT "ENome" 
+FROM eempresa.empregado 
+WHERE "Salario" >= (SELECT MAX(media) 
+                 	FROM  (	SELECT AVG("Salario") AS media
+                       		FROM  eempresa.empregado   
+		 			   		GROUP BY "CDep"
+                      	) AS tab    
+                 )						
+                       
+-- Listar o departamento com maior média salarial
+SELECT d."DNome", AVG("Salario")
+FROM eempresa.empregado e, eempresa.departamento  d
+WHERE e."CDep" = d."Codigo"
+GROUP BY d."DNome"
+HAVING AVG("Salario") >= ALL (
+                              SELECT AVG("Salario") 
+                              FROM eempresa.empregado  
+		 	       			  GROUP BY "CDep"
+                            )
+
+SELECT * FROM eempresa.departamento
+SELECT * FROM eempresa.empregado
+
+
+-- Listar os empregados que possuem dependentes
+
+ 
+
+-- Listar os empregados que possuem dependentes
+
+CREATE TABLE eempresa.dependente (
+    "cpf_resp" character varying(13) NOT NULL,
+    "nome" character varying(30) NOT NULL,
+	"sexo" character varying(4)
+);
+ALTER TABLE eempresa.dependente add CONSTRAINT pk_dependente PRIMARY KEY ("cpf_resp","nome");
+
+ALTER TABLE eempresa.dependente add CONSTRAINT fk_dependente_empregado FOREIGN KEY ("cpf_resp") REFERENCES eempresa.empregado("CPF");
+
+SELECT * FROM eempresa.empregado
+																		  
+INSERT INTO eempresa.dependente("cpf_resp", "nome", "sexo") VALUES
+('1234','Ana','F'),
+('4321', 'Bia', 'F'),
+('5678', 'Teo', 'M')
+;
+																		  
+INSERT INTO eempresa.dependente VALUES ('1234','Léo','M')
+
+SELECT * FROM eempresa.dependente
+																		  
+
+-- Listar o nome dos empregados que possuem dependentes
+
+SELECT DISTINCT "cpf_resp"
+FROM eempresa.dependente dep
+
+1)
+EXPLAIN
+SELECT e."ENome"
+FROM eempresa.empregado e 
+WHERE e."CPF" IN (
+	SELECT DISTINCT "cpf_resp"
+	FROM eempresa.dependente dep
+)
+
+2)
+
+EXPLAIN
+SELECT e."ENome"
+FROM eempresa.empregado e, (
+		SELECT DISTINCT "cpf_resp"
+		FROM eempresa.dependente dep
+	) AS tab
+WHERE e."CPF" = tab."cpf_resp"
+
+3)
+EXPLAIN
+SELECT e."ENome" 
+FROM eempresa.empregado e
+WHERE EXISTS (
+                SELECT * 
+    			FROM eempresa.dependente d
+                WHERE d.cpf_resp=e."CPF"
+              )
+4)
+
+EXPLAIN
+SELECT DISTINCT e."ENome" 
+FROM eempresa.empregado e, eempresa.dependente d
+WHERE e."CPF" = d.cpf_resp
+
+------------
+
+SELECT e.enome 
+FROM eempresa.empregado e
+WHERE EXISTS (
+                SELECT d.nome 
+    			FROM eempresa.dependente d
+                WHERE d.cpf_resp=e.cpf
+              )
+
+EXPLAIN
+SELECT e.enome 
+FROM eempresa.empregado e
+WHERE EXISTS (
+                SELECT * 
+    			FROM eempresa.dependente d
+                WHERE d.cpf_resp=e.cpf
+              )              
+              
+
+EXPLAIN
+SELECT DISTINCT e.enome 
+FROM eempresa.empregado e, eempresa.dependente d
+WHERE e.cpf = d.cpf_resp
+
+EXPLAIN
+SELECT e.enome 
+FROM eempresa.empregado e
+WHERE e.cpf IN (SELECT d.cpf_resp FROM eempresa.dependente d)
+
+-- Listar empregados que NÃO possuem dependentes 
+1)
+EXPLAIN
+SELECT e."ENome" 
+FROM eempresa.empregado e
+WHERE e."CPF" NOT IN (SELECT d.cpf_resp FROM eempresa.dependente d)
+
+2)
+EXPLAIN
+SELECT e."ENome" 
+from eempresa.empregado e
+WHERE NOT EXISTS (
+	SELECT * FROM eempresa.dependente d WHERE d.cpf_resp=e."CPF"
+)
+
+-- Listar nome de departamentos com empregados ganhando duas vezes mais 
+-- que a média do departamento
+
+SELECT * FROM eempresa.empregado
+																		  
+UPDATE eempresa.empregado SET "Salario" = 50000 WHERE "CPF"='4321'
+																		  
+SELECT * FROM eempresa.empregado where cdep=2
+
+1)
+SELECT d."DNome"
+FROM eempresa.departamento d
+WHERE EXISTS (SELECT * FROM eempresa.empregado e
+                       WHERE e."CDep"=d."Codigo" AND
+		      				 "Salario" > (2*(SELECT AVG("Salario") 
+                                           FROM eempresa.empregado e2
+										   WHERE e2."CDep"=e."CDep"
+                                          )
+               							)
+             )
+			 
+2)
+SELECT DISTINCT d."DNome"
+FROM empregado e2, departamento d(
+	SELECT e."CDep", AVG("Salario") as media 
+	FROM eempresa.empregado e
+	GROUP BY e."CDep"
+) AS tab
+WHERE e2."CDep" = tab."CDep" AND e2."CDep" = d."Codigo"
+AND e2."Salario" > 2*tab.media
+
+					
+SELECT e1.enome as empregado, e2.enome as chefe
+FROM eempresa.empregado e1, eempresa.empregado e2
+WHERE e1.chefe = e2.cpf																		  
+																		  
+SELECT * FROM eempresa.departamento
+SELECT * FROM eempresa.empregado where cdep=2
+
+
+SELECT d.dnome
+FROM eempresa.departamento d
+WHERE EXISTS (SELECT * FROM eempresa.empregado e
+                       WHERE e.cdep=d.codigo AND
+		      				 salario > (2*(SELECT AVG(salario) 
+                                           FROM eempresa.empregado e2
+										   WHERE e2.cdep=d.codigo
+                                          )
+               							)
+             )
+
+3)
+SELECT d.dnome
+FROM eempresa.departamento d
+WHERE codigo IN (
+                   SELECT e.cdep
+    			   FROM eempresa.empregado e, (
+                                                  SELECT cdep, AVG(salario) AS media
+                                                  FROM eempresa.empregado
+												  GROUP BY cdep
+                                               ) AS tab
+                    WHERE e.cdep = tab.cdep AND e.salario > 2*tab.media
+                 )
+                 
+SELECT  DISTINCT d.dnome 
+FROM eempresa.departamento d, 
+     eempresa.empregado e,
+     (
+        SELECT cdep, AVG(salario) AS media
+        FROM eempresa.empregado
+	    GROUP BY cdep
+     ) AS tab
+WHERE d.codigo = e.cdep AND e.cdep = tab.cdep AND e.salario > 2*tab.media
+
+-- Listar nome dos empregados com a quantidade de dependentes de cada empregado
+EXPLAIN
+SELECT e.enome, (SELECT COUNT(*) FROM eempresa.dependente WHERE cpf_resp=e.cpf)
+FROM eempresa.empregado e
+
+-- Problema: Empregados sem dependentes
+
+SELECT e.enome, COUNT(*) AS qtd_dep
+FROM eempresa.empregado e, eempresa.dependente d
+WHERE e.cpf = d.cpf_resp
+GROUP BY e.enome
+
+EXPLAIN
+SELECT e.enome, COUNT(*) AS qtd_dep
+FROM eempresa.empregado e, eempresa.dependente d
+WHERE e.cpf = d.cpf_resp
+GROUP BY e.cpf
+
+SELECT e.enome, 
+(SELECT COUNT(*) FROM eempresa.dependente WHERE cpf_resp=e.cpf) AS contagem
+FROM eempresa.empregado e
+WHERE contagem > 0
+
+
+-- Problema: Falha no caso de homônimos 
+
+SELECT e.enome, t.qtd_dep
+FROM eempresa.empregado e, (SELECT cpf_resp, COUNT(*) AS qtd_dep
+							FROM  eempresa.dependente 
+							GROUP BY cpf_resp
+		      				) AS t
+WHERE e.cpf=t.cpf_resp
+
+
+-> OPERAÇÕES AVANÇADAS
+
+CREATE TABLE eempresa.vendedor
+(
+    matr character varying(10) NOT NULL,    
+    nome character varying(30) NOT NULL,
+    salario numeric(7, 2),
+    CONSTRAINT pk_vendedor PRIMARY KEY (matr)
+)
+
+CREATE TABLE eempresa.produto
+(
+    cod_produto smallint NOT NULL,
+    descricao character varying(30) NOT NULL,
+    pr_compra numeric(7, 2),
+    pr_venda numeric(7, 2),
+    CONSTRAINT pk_produto PRIMARY KEY (cod_produto)
+)
+
+CREATE TABLE eempresa.venda
+(
+    matr character varying(10),
+    cod_produto smallint,
+    qtde smallint,
+    pr_venda numeric(7, 2),
+    data_hora_venda date,
+    CONSTRAINT pk_venda PRIMARY KEY (matr, cod_produto, data_hora_venda)
+)
+
+ALTER TABLE eempresa.venda
+    ADD CONSTRAINT fk_venda_vendedor FOREIGN KEY (matr)
+    REFERENCES eempresa.vendedor (matr)
+
+ALTER TABLE eempresa.venda
+    ADD CONSTRAINT fk_venda_produto FOREIGN KEY (cod_produto)
+    REFERENCES eempresa.produto (cod_produto) 
+
+INSERT INTO eempresa.vendedor VALUES('123','Gal',10000);
+INSERT INTO eempresa.vendedor VALUES('124','Gil',9000);
+INSERT INTO eempresa.vendedor VALUES('125','Sá',8000);
+INSERT INTO eempresa.vendedor VALUES('126','Zé',7000);
+
+INSERT INTO eempresa.produto VALUES(1,'CANECA ANTENADEV',15, 17.5);
+INSERT INTO eempresa.produto VALUES(2,'CANETA ANTENADEV',2, 3.5);
+INSERT INTO eempresa.produto VALUES(3,'CAMISETA ANTENADEV',20, 25);
+INSERT INTO eempresa.produto VALUES(4,'MOUSEPAD ANTENADEV',22, 25);
+
+INSERT INTO eempresa.venda VALUES('124',2,100,3,CURRENT_DATE);
+INSERT INTO eempresa.venda VALUES('124',3,5,25,CURRENT_DATE);
+INSERT INTO eempresa.venda VALUES('124',3,10,24,CURRENT_DATE+1);
+INSERT INTO eempresa.venda VALUES('125',2,100,3,CURRENT_DATE);
+INSERT INTO eempresa.venda VALUES('125',3,5,25,CURRENT_DATE);
+
+SELECT * FROM  eempresa.venda 
+
+-- Totalizar  a quantidade de produtos vendidos por vendedor e por produto
+SELECT v.matr, v.cod_produto, sum(v.qtde) as total, count(*) as quantidade
+FROM eempresa.venda v
+GROUP BY v.matr, v.cod_produto
+
+-- Agora recupere o nome do vendedor e a descrição do produto
+SELECT vd.nome, p.descricao, sum(v.qtde) as total, count(*) as quantidade
+FROM eempresa.venda v, eempresa.vendedor vd, eempresa.produto p
+WHERE v.matr = vd.matr AND v.cod_produto = p.cod_produto
+GROUP BY vd.nome, p.descricao
+
+SELECT vd.nome, p.descricao, sum(v.qtde) as total, count(*) as qtd_vendas
+FROM eempresa.venda v, eempresa.vendedor vd, eempresa.produto p
+WHERE v.matr = vd.matr AND v.cod_produto = p.cod_produto
+GROUP BY vd.nome, p.descricao
+																		  
+SELECT vd.nome, p.descricao, sum(v.qtde) as total, count(*) as qtd_vendas
+FROM eempresa.venda v, eempresa.vendedor vd, eempresa.produto p
+WHERE v.matr = vd.matr AND v.cod_produto = p.cod_produto
+GROUP BY vd.matr, p.cod_produto																		  
+
+-- Listar nome dos vendedores e quantidade de vendas efetuadas dos vendedores 
+-- com volume de vendas superior a R$ 500 
+-- classificado em ordem decrescente por quantidade de vendas
+
+SELECT vd.nome, count(*) as qtd_vendas
+FROM eempresa.venda v, eempresa.vendedor vd
+WHERE v.matr = vd.matr
+GROUP BY vd.nome																  
+HAVING sum(v.qtde*v.pr_venda) > 500
+ORDER BY count(*) DESC
+																		  
+SELECT * FROM eempresa.venda v																		  
+
+SELECT vd.nome, count(*) as qtd_vendas, sum(v.qtde*v.pr_venda)
+FROM eempresa.venda v, eempresa.vendedor vd
+WHERE v.matr = vd.matr
+GROUP BY vd.nome
+HAVING sum(v.qtde*v.pr_venda) > 500
+ORDER BY count(*) DESC
+
+-- Checando valores nulos
+SELECT * 
+FROM eempresa.empregado
+WHERE chefe IS NULL
+
+SELECT * 
+FROM eempresa.empregado
+WHERE chefe == NULL
+
+SELECT * 
+FROM eempresa.empregado
+WHERE chefe IS NOT NULL
+
+SELECT * 
+FROM eempresa.empregado
+WHERE chefe <> NULL
+
+
