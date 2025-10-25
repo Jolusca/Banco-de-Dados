@@ -88,15 +88,61 @@ join eempresa.empregado e on d.gerente = e.cpf
 
 -- 14) Recupere o CPF de todos os empregados que trabalham em Pesquisa ou que diretamente gerenciam um empregado que trabalha em Pesquisa.
 
+SELECT DISTINCT(e.cpf)
+FROM eempresa.empregado e
+JOIN eempresa.departamento d
+ON e.cpf = d.gerente OR e.cdep = d.codigo
+WHERE d.dnome = 'Pesquisa';
 
 -- 15) Recupere o nome e a cidade dos projetos que envolvem (contem) pelo menos um empregado que trabalha mais de 30 horas nesse projeto.
 
+SELECT Distinct(p.pnome), p.cidade
+FROM eempresa.projeto p
+JOIN eempresa.empregado e
+ON e.cdep = p.cdep
+WHERE e.cpf IN (
+	SELECT distinct(t.cpf)
+	FROM eempresa.tarefa t
+	WHERE t.horas > 30
+);
+
 -- 16) Recupere o nome e a data de nascimento dos gerentes de cada departamento.
+
+SELECT e.enome,e.nasc
+FROM eempresa.empregado e
+JOIN eempresa.departamento d
+ON e.cpf = d.gerente;
+
 
 -- 17) Recupere o nome e o endereco de todos os empregados que trabalham para o departamento "Pesquisa".
 
+SELECT e.enome,e.endereco
+FROM eempresa.empregado e
+JOIN eempresa.departamento d
+ON e.cdep = d.codigo
+WHERE d.dnome='Pesquisa';
+
 -- 18) Para cada projeto localizado em Icapui, recupere o codigo do projeto, o nome do departamento que o controla e o nome do seu gerente.
+
+SELECT p.pcodigo, d.dnome, e.enome
+FROM eempresa.projeto p
+JOIN eempresa.departamento d
+ON p.cdep = d.codigo
+JOIN eempresa.empregado e
+ON e.cpf = d.gerente
+WHERE p.cidade = 'Icapuí';
 
 -- 19) Recupere o nome e o sexo dos empregados que sao gerentes.
 
+SELECT e.enome, e.sexo
+FROM eempresa.empregado e
+JOIN eempresa.departamento d
+ON d.gerente = e.cpf
+
 -- 20) Recupere o nome e o sexo dos empregados que nao sao gerentes.
+
+SELECT e.enome, e.sexo
+FROM eempresa.empregado e
+LEFT JOIN eempresa.departamento d
+ON d.gerente = e.cpf
+WHERE d.gerente IS NULL
