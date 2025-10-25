@@ -88,6 +88,7 @@ join eempresa.empregado e on d.gerente = e.cpf
 
 -- 14) Recupere o CPF de todos os empregados que trabalham em Pesquisa ou que diretamente gerenciam um empregado que trabalha em Pesquisa.
 
+<<<<<<< HEAD
 SELECT DISTINCT(e.cpf)
 FROM eempresa.empregado e
 JOIN eempresa.departamento d
@@ -121,6 +122,39 @@ FROM eempresa.empregado e
 JOIN eempresa.departamento d
 ON e.cdep = d.codigo
 WHERE d.dnome='Pesquisa';
+=======
+select distinct e.cpf 
+from eempresa.empregado e
+join eempresa.departamento d on d.codigo = e.cdep or e.cpf = d.gerente
+where d.dnome = 'Pesquisa'
+
+--caso procurando o cpf do chefe de quem trabalha em pesquisa também
+select distinct e.cpf 
+from eempresa.empregado e
+join eempresa.departamento d on d.codigo = e.cdep
+where d.dnome = 'Pesquisa'
+union select distinct e.chefe
+from eempresa.empregado e
+join eempresa.departamento d on d.codigo = e.cdep
+where d.dnome = 'Pesquisa'
+
+-- 15) Recupere o nome e a cidade dos projetos que envolvem (contem) pelo menos um empregado que trabalha mais de 30 horas nesse projeto.
+
+select distinct p.pnome , p.cidade
+from eempresa.projeto p
+join eempresa.tarefa t on t.pcodigo=p.pcodigo
+where t.horas > 30
+
+-- 16) Recupere o nome e a data de nascimento dos gerentes de cada departamento.
+
+select e.enome , e.nasc
+from eempresa.empregado e 
+join eempresa.departamento d on e.cpf = d.gerente
+
+-- 17) Recupere o nome e o endereco de todos os empregados que trabalham para o departamento "Pesquisa".
+
+
+>>>>>>> 10cf799184096d9e795050733cb002acfb33993f
 
 -- 18) Para cada projeto localizado em Icapui, recupere o codigo do projeto, o nome do departamento que o controla e o nome do seu gerente.
 
@@ -134,6 +168,7 @@ WHERE p.cidade = 'Icapuí';
 
 -- 19) Recupere o nome e o sexo dos empregados que sao gerentes.
 
+<<<<<<< HEAD
 SELECT e.enome, e.sexo
 FROM eempresa.empregado e
 JOIN eempresa.departamento d
@@ -146,3 +181,6 @@ FROM eempresa.empregado e
 LEFT JOIN eempresa.departamento d
 ON d.gerente = e.cpf
 WHERE d.gerente IS NULL
+=======
+-- 20) Recupere o nome e o sexo dos empregados que nao sao gerentes.s
+>>>>>>> 10cf799184096d9e795050733cb002acfb33993f

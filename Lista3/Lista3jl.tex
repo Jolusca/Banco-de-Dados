@@ -1,0 +1,139 @@
+\documentclass[a4paper,12pt]{article}
+
+% Inclui o preâmbulo de um arquivo separado
+\input{preambulo}
+\begin{document}
+
+\begin{center}
+    \textbf{Universidade Federal do Ceará – UFC}\\
+    \textbf{Centro de Ciências – CC}\\
+    \textbf{Departamento de Computação – DC}\\
+    \textbf{Fundamentos de Bancos de Dados}
+\end{center}
+\vspace{0.5cm}
+
+\noindent
+\textbf{Exercício: SQL Intermediário}\\
+\textbf{Data de entrega:} 14/10/2025
+
+\vspace{0.7cm}
+
+\noindent
+\textbf{NOME:} João Lucas Oliveira Mota\\
+\textbf{MATRÍCULA:} 509597
+
+\vspace{1cm}
+\newpage
+\begin{center}
+    \Large\textbf{Lista de Exercícios SQL - Intermediário}
+\end{center}
+
+\vspace{0.5cm}
+
+\section*{Tabelas}
+
+\subsubsection*{Empregado}
+\begin{table}[h]
+\centering
+\caption{Tabela Empregado}
+\begin{tabular}{|l|l|l|l|l|l|l|l|}
+\hline
+\textbf{ENome}   & \textbf{CPF} & \textbf{Endereço} & \textbf{Nasc}   & \textbf{Sexo} & \textbf{Salário} & \textbf{Chefe} & \textbf{Cdep} \\ \hline
+Chiquin          & 1234         & rua 1, 1          & 02/02/62        & M             & 10000,00       & 8765          & 3            \\ \hline
+Helenita         & 4321         & rua 2, 2          & 03/03/63        & F             & 12000,00       & 6543          & 2            \\ \hline
+Pedrin           & 5678         & rua 3, 3          & 04/04/64        & M             & 9000,00        & 6543          & 2            \\ \hline
+Valtin           & 8765         & rua 4, 4          & 05/05/65        & M             & 15000,00       & Null          & 4            \\ \hline
+Zulmira          & 3456         & rua 5, 5          & 06/06/66        & F             & 12000,00       & 8765          & 3            \\ \hline
+Zefinha          & 6543         & rua 6, 6          & 07/07/67        & F             & 10000,00       & 8765          & 2            \\ \hline
+\end{tabular}
+\end{table}
+
+
+\subsubsection*{Departamento}
+\begin{table}[h]
+\centering
+\caption{Tabela Departamento}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{DNome}      & \textbf{Código} & \textbf{Gerente} \\ \hline
+Pesquisa           & 3               & 1234             \\ \hline
+Marketing          & 2               & 6543             \\ \hline
+Administração      & 4               & 8765             \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection*{Projeto}
+\begin{table}[h]
+\centering
+\caption{Tabela Projeto}
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{PNome}         & \textbf{PCódigo} & \textbf{Cidade}   & \textbf{Cdep} \\ \hline
+ProdutoA              & PA               & Cumbuco          & 3            \\ \hline
+ProdutoB              & PB               & Icapuí           & 3            \\ \hline
+Informatização        & Inf              & Fortaleza        & 4            \\ \hline
+Divulgação            & Div              & Morro Branco     & 2            \\ \hline
+\end{tabular}
+\end{table}
+
+
+\subsubsection*{Tarefa}
+\begin{table}[H]
+\centering
+\caption{Tabela Tarefa}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{CPF} & \textbf{PCódigo} & \textbf{Horas} \\ \hline
+1234         & PA               & 30.0            \\ \hline
+1234         & PB               & 10.0            \\ \hline
+4321         & PA               & 5.0             \\ \hline
+4321         & Div              & 35.0            \\ \hline
+5678         & Div              & 40.0            \\ \hline
+8765         & Inf              & 32.0            \\ \hline
+8765         & Div              & 8.0             \\ \hline
+3456         & PA               & 10.0            \\ \hline
+3456         & PB               & 25.0            \\ \hline
+3456         & Div              & 5.0             \\ \hline
+6543         & PB               & 40.0            \\ \hline
+\end{tabular}
+\end{table}
+
+\subsubsection*{DUnidade}
+\begin{table}[H]
+\centering
+\caption{Tabela DUnidade}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{DCódigo} & \textbf{DCidade} \\ \hline
+2                & Morro Branco     \\ \hline
+3                & Cumbuco          \\ \hline
+3                & Prainha          \\ \hline
+3                & Taíba            \\ \hline
+3                & Icapuí           \\ \hline
+4                & Fortaleza        \\ \hline
+\end{tabular}
+\end{table}
+
+
+\vspace{1cm}
+
+\section{ Questão 2}
+
+O código para as respostas dessa Questão está no arquivo anexado Q2.
+\vspace{1cm}
+
+\begin{flushright}
+\textit{“A leitura do mundo precede a leitura da palavra.”}\\
+Paulo Freire
+\end{flushright}
+
+\newpage
+\section*{Códigos SQL Anexados}
+\subsection{Questão 2}
+\lstinputlisting[
+    caption={Consultas SQL: Questão 1},
+    label=lst:consultas,
+]{lista2-jl.sql}
+
+
+\end{document}
