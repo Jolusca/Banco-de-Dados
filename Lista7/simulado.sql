@@ -83,22 +83,53 @@ INSERT INTO simulado.matricula (enum, dnome) VALUES
    Ache o nome da faculdade que não possui aluno algum.
 */
 
-select 
+select distinct fnome from simulado.faculdade f
+left join simulado.disciplina d on f.fid =d.fid
+left join simulado.matricula m on d.dnome = m.dnome
+where d.dnome is null
 
 /* B)
    Encontre o nome dos estudantes matriculados em todas as
    disciplinas da faculdade “FAFOR”.
 */
 
+select distinct enome from simulado.estudante e
+join simulado.matricula m on e.enum = m.enum
+join simulado.disciplina d on d.dnome = m.dnome
+join simulado.faculdade f on f.fid = d.fid
+where f.fnome = 'FAFOR'
+group by e.enum, e.enome
+having count(*)= (
+	select count(*) from simulado.faculdade f
+	join simulado.disciplina d on d.fid = f.fid
+	where f.fnome = 'FAFOR'
+)
 /* C)
    Recupere o nome e a idade dos estudantes que foram ou são
    estudantes da faculdade “FAFOR”, mas que nunca estudaram
    na faculdade “FANÓIS”.
 */
 
+select distinct enome, idade from simulado.estudante e 
+join simulado.matricula m on e.enum = m.enum
+join simulado.disciplina d on d.dnome = m.dnome
+join simulado.faculdade f on f.fid = d.fid
+where f.fnome = 'FAFOR'
+except
+select distinct enome, idade from simulado.estudante e 
+join simulado.matricula m on e.enum = m.enum
+join simulado.disciplina d on d.dnome = m.dnome
+join simulado.faculdade f on f.fid = d.fid
+where f.fnome = 'FANÓIS'
+
 /* D)
    Recupere a quantidade de disciplinas da faculdade “FAFOR”.
 */
+
+	select count(*) from simulado.faculdade f
+	join simulado.disciplina d on d.fid = f.fid
+	where f.fnome = 'FAFOR'
+
 
 /* E)
    Ache o nome dos estudantes com idade acima de 20 anos que
@@ -106,11 +137,20 @@ select
    faculdade “FAFOR”.
 */
 
+select distinct enome from simulado.estudante e
+join simulado.matricula m on e.enum = m.enum
+join simulado.disciplina d on d.dnome = m.dnome
+join simulado.faculdade f on f.fid = d.fid
+where f.fnome = 'FAFOR' AND e.idade >20
+
+
 /* F)
    Recupere o número e o nome dos estudantes com idade menor
    que 19 anos.
 */
 
+select distinct enum , enome from simulado.estudante e
+where e.idade < 19
 
 /* =========================================================
    QUESTÃO 2 (2 pontos) — Visão SQL
