@@ -1,3 +1,5 @@
+
+
 -- Limpando e criando as tabelas
 
 DROP TABLE IF EXISTS simulado.matricula;
@@ -162,6 +164,17 @@ where e.idade < 19
    disciplinas em que ele/ela está matriculado(a).
 */
 
+create or replace view simulado.vresumo as 
+select
+	e.enome,
+	count(m.dnome) as qntd_disciplinas
+from simulado.estudante e
+left join simulado.matricula m
+	on e.enum=m.enum
+group by e.enome;
+
+select * from simulado.vresumo
+
 /* b)
    Considerando que estamos utilizando o PostgreSQL em sua
    versão mais recente, justifique o que irá ocorrer ao se
@@ -171,6 +184,22 @@ where e.idade < 19
    SET enome = 'Gal'
    WHERE enome = 'Gil';
 */
+   UPDATE simulado.vresumo
+   SET enome = 'Gal'
+   WHERE enome = 'Gil';
+/* views com o group by não atualizam, o update falha
+
+View simples (1 tabela, sem agregação) → pode atualizar
+
+View com JOIN + GROUP BY → não pode atualizar
+
+Para atualizar mesmo assim → só com INSTEAD OF TRIGGER
+
+Atualizar direto na tabela base → sempre funciona
+
+Materialized view → precisa de REFRESH
+*/
+
 
 
 /* =========================================================
@@ -181,6 +210,52 @@ where e.idade < 19
    Defina um gatilho (trigger) a fim de assegurar que cada
    estudante se matricule em no máximo 5 disciplinas.
 */
+
+create or replace function matr_max()
+returns trigger as $$
+declare 
+	qntd_matr int;
+begin 
+	select count(*) 
+	into qntd_matr
+	from simulado.matricula
+	where enum = new.enum;
+	
+	if qntd_matr >=5 then
+		raise exception 'aluno não pode se matricular em mais de 5 disciplinas';
+	end if;
+
+	return new;
+end;
+$$ language 'plpgsql';
+
+create trigger tg_matr_max
+before insert on simulado.matricula
+for each row
+execute function matr_max();
+
+-- testando
+
+SELECT enum, COUNT(*) 
+FROM simulado.matricula
+WHERE enum = 1
+GROUP BY enum;
+
+INSERT INTO simulado.matricula (enum, dnome)
+VALUES (1, 'IA');
+
+INSERT INTO simulado.matricula (enum, dnome)
+VALUES (1, 'Calc');
+
+INSERT INTO simulado.matricula (enum, dnome)
+VALUES (1, 'Redes');
+
+INSERT INTO simulado.matricula (enum, dnome)
+VALUES (1, 'POO');
+
+
+
+
 
 
 /* =========================================================
