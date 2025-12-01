@@ -1,0 +1,199 @@
+/* =======================================================================
+   Universidade Federal do Ceará – UFC
+   Centro de Ciências – CC
+   Departamento de Computação – DC
+   Disciplina: Fundamentos de Bancos de Dados
+
+   Exercício: Visões Virtuais e Materializadas
+   Objetivo : Criação e atualização de visões
+   Data     : 02/12/2025
+   ======================================================================= */
+
+
+/* =======================================================================
+   1 - INTRODUÇÃO
+   =======================================================================
+
+   Uma visão é uma maneira alternativa de visualização dos dados derivados
+   de uma ou mais tabelas em um banco de dados. Seu objetivo é disponibilizar
+   dados ao usuário final com maior segurança.
+
+   O usuário passa a visualizar apenas partes selecionadas das informações
+   armazenadas no banco. As visões também permitem definir informações
+   derivadas e calculadas.
+
+   -----------------------------------------------------------------------
+   VANTAGENS DAS VISÕES
+   -----------------------------------------------------------------------
+   • Permitem ao usuário visualizar apenas os dados de seu interesse.
+   • Simplificam a manipulação dos dados.
+   • Otimizam a forma como os usuários enxergam o banco de dados.
+   • Provêm segurança, pois restringem o acesso direto às tabelas.
+   • Permitem a criação de visões sobre outras visões.
+
+   -----------------------------------------------------------------------
+   RESTRIÇÕES DE SINTAXE
+   -----------------------------------------------------------------------
+   • Obrigatório o uso da cláusula SELECT.
+   • Não é permitido o uso de:
+     - SELECT INTO
+     - ORDER BY
+     - COMPUTE / COMPUTE BY
+     - UNION
+   • Não podem referenciar tabelas temporárias.
+   • Não é possível criar triggers diretamente sobre visões.
+   • Não é possível criar índices (dependende do SGBD).
+   • Máximo de 250 colunas por visão.
+
+   -----------------------------------------------------------------------
+   RESTRIÇÕES DE ATUALIZAÇÃO EM VISÕES
+   -----------------------------------------------------------------------
+   • A modificação não pode afetar mais de uma tabela base.
+   • Não é permitido alterar:
+     - Colunas derivadas
+     - Funções
+     - Agregações
+   • Colunas NOT NULL fora da visão podem causar erro.
+   • Se a visão for criada com SELECT *, novas colunas da tabela não aparecem 
+     automaticamente na visão.
+   • Se a tabela base for removida, a visão deixa de funcionar.
+
+   ======================================================================= */
+
+-- ========================
+-- 3 - EXERCÍCIO
+-- ========================
+
+-- 3.1. Crie as visões solicitadas a seguir.
+
+-- 3.2. Para cada operação de atualização (UPDATE, INSERT e DELETE) sobre as visões:
+-- a) Indicar se a atualização é permitida ou não.
+-- b) Caso permitida, indicar a tradução para as tabelas base.
+-- c) Caso não permitida, justificar e explicar a semântica.
+-- d) (Opcional) Criar Stored Procedures para permitir as atualizações.
+
+-- ========================
+-- 4 - TAREFAS
+-- ========================
+
+-- 4.1. Criar uma visão que recupere para cada empregado:
+-- - Nome
+-- - Sexo
+-- - Salário
+
+create or replace view v_empregado_resumo as
+select 
+    enome
+    sexo
+    salario
+from eempresa.empregado;
+
+select * from v_empregado_resumo;
+
+-- 4.2. Usando a visão anterior, recuperar o nome do funcionário com maior salário.
+
+select enome from v_empregado_resumo 
+where salario = (
+	select max(salario)
+	from v_empregado_resumo
+);
+
+-- 4.3. Usando a visão anterior, efetuar uma atualização que conceda um aumento de 10%.
+
+update v_empregado_resumo
+set salario = salario*1.10
+
+-- 4.4. Criar uma visão que recupere para cada departamento:
+--      - Nome do departamento
+--      - Nome do gerente
+
+create or replace view v_dep_resumo as 
+select 
+	d.dnome,
+	e.enome
+from eempresa.departamento d
+join eempresa.empregado e
+on d.gerente = e.cpf
+	
+select * from v_dep_resumo
+
+-- 4.5. Usando a visão anterior, alterar o nome do gerente do departamento de Pesquisa.
+
+--Update não permitido, pois usa o Join entre duas tabelas
+--para permitir, precisaria ter o procedure abaixo
+
+create or replace procedure atualizar_gerente_dept(
+	p_dnome text,
+	p_novo_nome text
+)
+language plpgsql
+as $$
+begin
+	update eempresa.empregado
+	set enome = p_novo_nome
+	where cpf = (
+		select d.gerente
+		from eempresa.departamento d
+		where d.dnome = p_dnome
+	);
+end;
+$$
+
+call atualizar_gerente_dept('Pesquisa', 'Chico')
+
+-- 4.6. Usando a visão anterior, alterar o nome do departamento do empregado Chiquin.
+
+-- 4.7. Criar uma visão que recupere para cada empregado com salário menor que 500:
+--      - Nome
+--      - Sexo
+--      - Salário
+
+
+-- 4.8. Usando a visão anterior, conceder um aumento de 600 a todos os empregados da visão.
+
+
+
+-- 4.9. Usando a mesma visão, excluir os empregados com salário entre 1000 e 2000.
+
+
+
+-- 4.10. Ainda usando essa visão, inserir uma nova tupla.
+
+
+
+-- 4.11. Criar uma visão que recupere para cada departamento:
+--       - Código do departamento
+--       - Nome do departamento
+--       - CPF do gerente
+--       - Nome do gerente
+
+
+-- 4.12. Usando a visão anterior, alterar o código do departamento de informática.
+
+
+
+-- 4.13. Usando a mesma visão, alterar o CPF do empregado Chiquin.
+
+
+
+-- 4.14. Ainda com a mesma visão, alterar o nome do empregado Chiquin.
+
+
+
+-- 4.15. Criar uma visão que recupere para cada departamento:
+--       - Código
+--       - Nome
+--       - Quantidade de empregados
+--       - Maior salário
+--       - Menor salário
+--       - Média salarial
+
+
+
+
+-- 4.16. Usando a visão anterior:
+--       - Alterar a média salarial do departamento de código 1.
+--       - Alterar a quantidade de empregados do departamento de código 1.
+--       - Excluir o departamento de código 1.
+--       - Inserir um novo departamento.
+--       - Alterar o nome de um dos departamentos que aparecem na visão.
