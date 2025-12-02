@@ -21,6 +21,13 @@ create or replace function eempresa.lista5_q21 ()
 -- E insere uma tupla em Tarefa para cada projeto
 -- (para este empregado e número de horas).
 -- ------------------------------------------------------------
+create or replace function eempresa.lista5_q22(pcpf character varying, numhoras integer)
+language plpgsql
+as $$
+begin 
+	open c for 
+		select *
+		from 
 
 
 
@@ -29,19 +36,49 @@ create or replace function eempresa.lista5_q21 ()
 -- 2.3 Crie um procedimento que retorne o CPF do empregado
 --     com maior salário.
 -- ------------------------------------------------------------
+create or replace function eempresa.lista5_q23()
+returns varchar
+language plpgsql
+as $$
+declare cpf_maior varchar;
+begin
+	select cpf 
+	into cpf_maior
+	from eempresa.empregado
+	where salario = (
+		select max(salario) from eempresa.empregado
+	);
+	return cpf_maior;
+end;
+$$;
 
-
-
+select * from eempresa.lista5_q23()
 
 -- ------------------------------------------------------------
 -- 2.4 Crie um procedimento que recebe como parâmetro
 --     o código de um departamento e retorna o CPF
 --     do empregado deste departamento com maior salário.
 -- ------------------------------------------------------------
+create or replace function eempresa.lista5_q24(pcdep int)
+returns varchar
+language plpgsql
+as $$
+declare 
+	pcpf varchar;
+begin
+	select cpf 
+	into pcpf
+	from eempresa.empregado e
+	where cdep = pcdep and salario >= (
+		select max(salario)
+		from eempresa.empregado
+		where cdep=pcdep
+	) limit 1;
+	return pcpf;
+end;
+$$;
 
-
-
-
+select * from eempresa.lista5_q24('2')
 -- ------------------------------------------------------------
 -- 2.5 Crie um procedimento que recebe como parâmetro
 --     o código de um projeto e retorna o total de horas
