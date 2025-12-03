@@ -101,7 +101,7 @@ where salario = (
 -- 4.3. Usando a visão anterior, efetuar uma atualização que conceda um aumento de 10%.
 
 update v_empregado_resumo
-set salario = salario*1.10
+set salario = salario*0.90
 
 -- 4.4. Criar uma visão que recupere para cada departamento:
 --      - Nome do departamento
@@ -112,7 +112,7 @@ select
 	d.dnome,
 	e.enome
 from eempresa.departamento d
-join eempresa.empregado e
+join eempresa.empregado e 
 on d.gerente = e.cpf
 	
 select * from v_dep_resumo
@@ -143,22 +143,42 @@ call atualizar_gerente_dept('Pesquisa', 'Chico')
 
 -- 4.6. Usando a visão anterior, alterar o nome do departamento do empregado Chiquin.
 
--- 4.7. Criar uma visão que recupere para cada empregado com salário menor que 500:
+-- 4.7. Criar uma visão que recupere para cada empregado com salário menor que 5000:
 --      - Nome
 --      - Sexo
 --      - Salário
 
+--valor ajustado para o meu banco de dados
+
+create or replace view eempresa.lista4_q47 as 
+select 
+	enome as nome_empregado,
+	sexo as  sexo_empregado,
+	salario as salario_empregado
+from eempresa.empregado	
+where salario <= 9000
+
+
+select * from eempresa.lista4_q47
 
 -- 4.8. Usando a visão anterior, conceder um aumento de 600 a todos os empregados da visão.
 
-
+update eempresa.lista4_q47
+set salario_empregado = salario_empregado + 60
 
 -- 4.9. Usando a mesma visão, excluir os empregados com salário entre 1000 e 2000.
 
+delete from eempresa.lista4_q47
+where salario_empregado between 6300 and 6500;
+/*/
+ERROR:  atualização ou exclusão em tabela "empregado" viola restrição de chave estrangeira "tarefa_cpf_fkey" em "tarefa"
+Chave (cpf)=(5678) ainda é referenciada pela tabela "tarefa". */
 
 
 -- 4.10. Ainda usando essa visão, inserir uma nova tupla.
-
+--as colunas fora da visão não permitem valores nulos. não é possível
+insert into eempresa.lista4_q47 (nome_empregado, sexo_empregado, salario_empregado)
+values ('Carlos', 'M', 4800);
 
 
 -- 4.11. Criar uma visão que recupere para cada departamento:
@@ -166,10 +186,36 @@ call atualizar_gerente_dept('Pesquisa', 'Chico')
 --       - Nome do departamento
 --       - CPF do gerente
 --       - Nome do gerente
+create or replace view eempresa.lista4_q411 as
+select 
+	d.codigo as codigo,
+	d.dnome as nome,
+	d.gerente as cpf_gerente,
+	e.enome as nome_gerente
+from eempresa.departamento d join
+eempresa.empregado e on e.cpf = d.gerente;
 
+select * from eempresa.lista4_q411	
 
 -- 4.12. Usando a visão anterior, alterar o código do departamento de informática.
 
+create or replace procedure eempresa.atualiza_codigo_dep(
+    p_nome_dep text,
+    p_novo_codigo int
+)
+language plpgsql
+as $$
+begin
+    update eempresa.departamento
+    set codigo = p_novo_codigo
+    where dnome = p_nome_dep;
+end;
+$$;
+
+
+call eempresa.atualiza_codigo_dep('Pesquisa', 10);
+
+-- alteração viola chave primária e referenciado como chave estrangeira em empregado.
 
 
 -- 4.13. Usando a mesma visão, alterar o CPF do empregado Chiquin.
