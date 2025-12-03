@@ -220,11 +220,41 @@ call eempresa.atualiza_codigo_dep('Pesquisa', 10);
 
 -- 4.13. Usando a mesma visão, alterar o CPF do empregado Chiquin.
 
+create or replace procedure eempresa.atualiza_cpf(
+    p_nome_emp text,
+    p_novo_cpf int
+)
+language plpgsql
+as $$
+begin
+    update eempresa.empregado
+    set cpf = p_novo_cpf
+    where enome = p_nome_emp;
+end;
+$$;
 
+CALL eempresa.atualiza_cpf('Chico', 9999);
+
+-- não funciona pelo mesmo motivo
+select * from eempresa.empregado
 
 -- 4.14. Ainda com a mesma visão, alterar o nome do empregado Chiquin.
 
-
+create or replace procedure eempresa.atualiza_nome(
+    p_nome_emp text,
+    p_novo_nome text
+)
+language plpgsql
+as $$
+begin
+    update eempresa.empregado
+    set enome = p_novo_nome
+    where enome = p_nome_emp;
+end;
+$$;
+-- Funciona por não ser chave estrangeira
+CALL eempresa.atualiza_nome('Chiquin', 'Chico');
+select * from eempresa.empregado
 
 -- 4.15. Criar uma visão que recupere para cada departamento:
 --       - Código
@@ -234,12 +264,29 @@ call eempresa.atualiza_codigo_dep('Pesquisa', 10);
 --       - Menor salário
 --       - Média salarial
 
+create or replace view eempresa.lista4_q415 as
+select 
+	d.codigo 			as cod_dep,
+	d.dnome 			as nome_dep,
+	count(e.cpf) 	as quantidade_empregados,
+	max(e.salario)	as maior_salario,
+	min(e.salario)	as menor_salario,
+	avg(e.salario)	as media_salario
+from eempresa.departamento d
+left join eempresa.empregado e
+	on d.codigo = e.cdep
+group by d.codigo, d.dnome;
 
-
-
+select * from eempresa.lista4_q415
 -- 4.16. Usando a visão anterior:
 --       - Alterar a média salarial do departamento de código 1.
 --       - Alterar a quantidade de empregados do departamento de código 1.
 --       - Excluir o departamento de código 1.
 --       - Inserir um novo departamento.
 --       - Alterar o nome de um dos departamentos que aparecem na visão.
+
+
+-- Nenhuma das operações da questão 4.16 pode ser realizada
+-- diretamente na visão da 4.15 de forma automática.
+-- Todas exigem tradução explícita para as tabelas base,
+-- preferencialmente por meio de stored procedures.
