@@ -6,14 +6,37 @@
 -- 2. FAÇA O QUE SE PEDE
 -- ============================================================
 
+Select * from eempresa.empregado
 
+SELECT table_name, column_name, data_type
+FROM information_schema.columns
+WHERE table_schema = 'eempresa'
+ORDER BY table_name, ordinal_position;
 -- ------------------------------------------------------------
 -- 2.1 Crie um procedimento para cadastrar um empregado.
 -- ------------------------------------------------------------
-create or replace function eempresa.lista5_q21 ()
 
+create or replace function eempresa.lista5_q21 (
+	p_enome 		varchar,
+	p_cpf 			varchar,
+	p_salario 		int
+)
+returns void
+language plpgsql
+as $$
+begin
+	insert into eempresa.empregado(
+		enome, cpf, salario
+	)
+	values(
+		p_enome, p_cpf, p_salario
+	);
+end;
+$$
 
+select eempresa.lista5_q21('Pedro', '8888', 3500);
 
+select * from eempresa.empregado
 -- ------------------------------------------------------------
 -- 2.2 Crie um procedimento que recebe como parâmetro:
 --     - CPF de um empregado
@@ -21,16 +44,34 @@ create or replace function eempresa.lista5_q21 ()
 -- E insere uma tupla em Tarefa para cada projeto
 -- (para este empregado e número de horas).
 -- ------------------------------------------------------------
-create or replace function eempresa.lista5_q22(pcpf character varying, numhoras integer)
+create or replace function eempresa.lista5_q22(
+    pcpf character varying, 
+    p_numhoras integer
+)
+returns void
 language plpgsql
 as $$
+declare 
+    c cursor for select pcodigo from eempresa.projeto;
+    v_pcodigo varchar;
 begin 
-	open c for 
-		select *
-		from 
+    open c;
+
+    loop
+        fetch c into v_pcodigo;
+        exit when not found;
+
+        insert into eempresa.tarefa(cpf, pcodigo, horas)
+        values (pcpf, v_pcodigo, p_numhoras)
+        on conflict do nothing;
+    end loop;
+
+    close c;
+end;
+$$;
 
 
-
+select eempresa.lista5_q22('1234', 10);
 
 -- ------------------------------------------------------------
 -- 2.3 Crie um procedimento que retorne o CPF do empregado
