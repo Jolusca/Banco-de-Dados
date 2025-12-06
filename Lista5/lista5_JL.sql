@@ -126,8 +126,25 @@ select * from eempresa.lista5_q24('2')
 --     deste projeto.
 -- ------------------------------------------------------------
 
+create or replace function eempresa.lista5_q25(
+	p_pcodigo varchar
+)
+returns numeric
+language plpgsql
+as $$
+declare
+	total_horas numeric;
+begin
+	select sum(horas)
+	into total_horas
+	from eempresa.tarefa
+	where pcodigo = p_pcodigo;
 
+	return total_horas;
+end;
+$$
 
+select eempresa.lista5_q25('PA');
 
 -- ------------------------------------------------------------
 -- 2.6 Crie um procedimento que recebe como parâmetro
@@ -135,8 +152,22 @@ select * from eempresa.lista5_q24('2')
 --     de todos os empregados com esta taxa.
 -- ------------------------------------------------------------
 
+create or replace function eempresa.lista5_q26(
+	p_taxa numeric
+)
+returns void
+language plpgsql
+as $$
+begin
+	update eempresa.empregado
+	set salario = salario*p_taxa;
+end;
+$$
 
 
+select eempresa.lista5_q26(0.1);
+
+select salario from eempresa.empregado
 
 -- ------------------------------------------------------------
 -- 2.7 Crie uma trigger para impedir que seja excluído
