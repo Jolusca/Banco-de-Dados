@@ -174,8 +174,30 @@ select salario from eempresa.empregado
 --     um empregado que ainda esteja alocado em alguma tarefa.
 -- ------------------------------------------------------------
 
+create or replace function eempresa.trg_lista5_q27()
+returns trigger
+language plpgsql
+as $$
+begin 
+	if exists(
+		select 1
+		from eempresa.tarefa
+		where cpf = old.cpf
+	) then
+		raise exception 'Empregado possui tarefa';
+	end if;
 
+	return old;
+end;
+$$;
 
+create trigger impede_excluir_empregado
+before delete on eempresa.empregado
+for each row 
+execute function eempresa.trg_lista5_q27()
+
+delete from eempresa.empregado
+where cpf = '1234';
 
 -- ------------------------------------------------------------
 -- 2.8 Crie uma trigger para que sempre que seja excluído
@@ -183,8 +205,22 @@ select salario from eempresa.empregado
 --     todas as suas tarefas.
 -- ------------------------------------------------------------
 
+create or replace function eempresa.trg_lista5_q28()
+returns trigger
+language plpgsql
+as $$
+begin
+ 	delete from eempresa.tarefa
+	where pcodigo = old.pcodigo;
+	return old;
 
+end;
+$$;
 
+create trigger exclui_tarefas
+before delete on eempresa.projeto
+for each row 
+execute function eempresa.trg_lista5_q28();
 
 -- ------------------------------------------------------------
 -- 2.9 Crie uma trigger para que sempre que seja cadastrado
@@ -193,6 +229,48 @@ select salario from eempresa.empregado
 -- ------------------------------------------------------------
 
 
+create or replace function eempresa.trg_aloca_tarefa()
+returns trigger
+language plpgsql
+as $$
+declare
+	projeto_encontrado varchar;
+begin
+    -- Encontra o projeto com menor total de horas
+	select pcodigo
+	into projeto_encontrado
+	from eempresa.tarefa
+	group by pcodigo
+	order by sum(horas)
+	limit 1;
+
+    -- Aloca o novo empregado nesse projeto com 20 horas
+	insert into eempresa.tarefa (cpf, pcodigo, horas)
+	values (new.cpf, projeto_encontrado, 20);
+
+	return new;
+end;
+$$;
+
+create trigger aloca_tarefa
+after insert on eempresa.empregado
+for each row
+execute function eempresa.trg_aloca_tarefa();
+
+select * from eempresa.tarefa
+
+SELECT pcodigo, SUM(horas)
+FROM eempresa.tarefa
+GROUP BY pcodigo;
+
+INSERT INTO eempresa.empregado
+(enome, cpf, endereco, nasc, sexo, salario, chefe, cdep)
+VALUES
+('Teste Trigger2', '7777', 'Rua X', '2000-01-01', 'M', 5000, '8765', 3);
+
+SELECT *
+FROM eempresa.tarefa
+WHERE cpf = '7777';
 
 
 -- ============================================================
