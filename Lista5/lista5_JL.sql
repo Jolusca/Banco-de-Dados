@@ -283,7 +283,31 @@ WHERE cpf = '7777';
 --     na cidade de “Fortaleza”.
 -- ------------------------------------------------------------
 
+create or replace function eempresa.lista5_3a()
+returns trigger
+language plpgsql
+as $$
+begin
+	if not exists(
+		select 1
+		from eempresa.dunidade
+		where dcodigo = new.codigo
+		and dcidade = 'Fortaleza'
 
+	) then
+	raise exception 'Dept.não possui unidade em Fortaleza';
+
+	end if;
+return new;
+end;
+$$;
+
+
+create trigger trg_lista5_q3a
+before insert or update
+on eempresa.departamento
+for each row
+execute function eempresa.lista5_3a();
 
 
 -- ------------------------------------------------------------
