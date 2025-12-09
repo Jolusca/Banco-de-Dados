@@ -315,9 +315,56 @@ execute function eempresa.lista5_3a();
 --     seu gerente.
 -- ------------------------------------------------------------
 
+create or replace function eempresa.lista5_3b()
+returns trigger
+language plpgsql
+as $$
+declare
+	salario_chefe numeric;
+begin
+	if new.chefe is not null then
+		select salario into salario_chefe
+		from eempresa.empregado
+		where cpf = new.chefe;
 
+		if new.salario > salario_chefe then
+			raise exception 'salario não deve ultrapassar o do chefe';
+		end if;
+	end if;
 
+	return new;
+end;
+$$;
+
+create or replace trigger trg_salario_chefe
+before insert or update on eempresa.empregado
+for each row
+execute function eempresa.lista5_3b
 
 -- ------------------------------------------------------------
 -- 3.c Cada empregado não pode trabalhar mais do que 40 horas.
 -- ------------------------------------------------------------
+
+create or replace function eempresa.lista5_3c()
+returns trigger
+language plpgsql
+as $$
+declare soma_horas numeric;
+begin
+	select sum(horas) + new.horas
+	into soma_horas
+	from eempresa.tarefa
+	where cpf = new.cpf;
+
+	if soma_horas > 40 then
+		raise exception 'Empregado não pode ter mais do que 40 horas';
+	end if;
+
+	return new;
+end;
+$$;
+
+create or replace trigger trg_hora_max
+before insert or update on eempresa.tarefa
+for each row
+execute function eempresa.lista5_3c();
