@@ -269,3 +269,15 @@ VALUES (1, 'POO');
    em todas as disciplinas da faculdade “FANÓIS”.
 */
 
+
+select * from simulado.estudante
+select * from simulado.disciplina
+select * from simulado.faculdade
+
+create or replace function simulado.questao4(
+	enum integer
+)
+language plpgsql
+as $$
+begin
+	
