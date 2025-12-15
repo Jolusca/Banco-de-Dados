@@ -117,17 +117,86 @@ FROM lista06.banco_horas
 ORDER BY emp_matricula;
 
 
-
 -- 2.3. Crie uma stored procedure que receba como parâmetro de entrada dois parâmetros
 -- o ano e o mês. Este procedimento deve retornar a matrícula do empregado com
 -- maior número de horas no banco de horas.
 
+select * from lista06.banco_horas
 
+create or replace function lista06.questao23(
+		p_ano integer,
+		p_mes integer
+)
+returns integer
+language plpgsql
+as $$
+declare v_matr integer;
+begin
+	select emp_matricula
+	into v_matr
+	from lista06.banco_horas 
+	where ban_ano= p_ano
+	and ban_mes = p_mes
+	group by emp_matricula
+	order by sum(ban_total_horas) desc
+	limit 1;
+	return v_matr;
+end;
+$$;
+
+select lista06.questao23(2025, 1);
+	
 -- 2.4. Crie uma stored procedure que receba como parâmetro de entrada quatro
 -- parâmetros a matrícula do empregado, o ano, o mês e o último dia do mês. Este
 -- procedimento deve inserir um conjunto de tuplas na relação freqüência referentes
 -- ao empregado e período em questão.
 
+CREATE OR REPLACE FUNCTION lista06.questao24(
+    p_matr INTEGER,
+    p_ano  INTEGER,
+    p_mes  INTEGER,
+    p_dia  INTEGER
+)
+RETURNS void
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_data DATE;
+BEGIN
+    v_data := make_date(p_ano, p_mes, 1);
+
+    WHILE EXTRACT(DAY FROM v_data) <= p_dia LOOP
+
+        INSERT INTO lista06.frequencia (
+            emp_matricula,
+            freq_data,
+            freq_hora_entrada,
+            freq_hora_saida,
+            freq_horas_excedentes,
+            freq_horas_noturnas
+        )
+        VALUES (
+            p_matr,
+            v_data,
+            NULL,
+            NULL,
+            0,
+            0
+        );
+
+        v_data := v_data + INTERVAL '1 day';
+    END LOOP;
+
+    RETURN;
+END;
+$$;
+
+SELECT lista06.questao24(1, 2025, 1, 31);
+
+SELECT * 
+FROM lista06.frequencia
+WHERE emp_matricula = 1
+ORDER BY freq_data;
 
 -- 2.5. Crie uma stored procedure que receba como parâmetro de entrada três parâmetros
 -- a matrícula do empregado, o ano e o mês. Este procedimento deve atualizar o valor
