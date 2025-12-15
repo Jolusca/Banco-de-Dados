@@ -8,4 +8,4 @@ https://drive.google.com/drive/u/0/folders/17hQKcpNuzGLsSAn9lhtC0h3pOrl3IacA
 - [x] Lista 4 (Visões)
 - [x] Lista 5 (Triggers)
 - [ ] Lista 6 (Triggers)
-- [x] Lista 7 (simulado) (tirar dúvida Q4)
+- [x] Lista 7 (simulado)

@@ -273,11 +273,22 @@ VALUES (1, 'POO');
 select * from simulado.estudante
 select * from simulado.disciplina
 select * from simulado.faculdade
+select * from simulado.matricula
 
 create or replace function simulado.questao4(
-	enum integer
+	p_enum integer
 )
+returns void
 language plpgsql
 as $$
 begin
-	
+	insert into simulado.matricula(enum, dnome)
+		select distinct p_enum, d.dnome from simulado.disciplina d
+		join simulado.faculdade f on f.fid = d.fid
+		where fnome = 'FANÓIS';
+	end;
+$$
+
+
+
+select simulado.questao4(1);
