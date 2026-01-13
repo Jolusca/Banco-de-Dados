@@ -1,0 +1,192 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This project aims to create the UFC template for presentation.                %%
+%% author: Maurício Moreira Neto - Doctoral student in Computer Science (MDCC)   %%
+%% contacts:                                                                     %%
+%%    e-mail: maumneto@ufc.br                                                    %%
+%%    linktree: https://linktr.ee/maumneto                                       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass{libs/ufc_format}
+% Inserting the preamble file with the packages
+\input{libs/preamble.tex}
+% Inserting the references file
+\bibliography{references.bib}
+%\setbeamertemplate{itemize item}{\textbullet} % Marcador padrão (bolinha)
+\setbeamertemplate{itemize subitem}{\large\textbullet} % Marcador para subitens (traço)
+% Title
+\title[Junções]{\huge\textbf{Junções}}
+% Subtitle
+\subtitle{Álgebra Relacional}
+% Author of the presentation
+\author{João Lucas Oliveira Mota}
+
+% Institute's Name
+\institute[UFC]{
+    % email for contact
+    \normalsize{\email{jlucasolivera2002@gmail.com}}
+    \newline
+    % Department Name
+    \department{Departamento de Teleinformática}
+    \newline
+    % university name
+    \ufc
+}
+% date of the presentation
+\date{\today}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Start Document of the Presentation                                           %%               
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+% insert the code style
+\input{libs/code_style}
+
+%% ---------------------------------------------------------------------------
+% First frame (with tile, subtitle, ...)
+\begin{frame}
+    \maketitle
+\end{frame}
+
+%% ---------------------------------------------------------------------------
+% Second frame
+\begin{frame}{Sumário}
+    \begin{multicols}{2}
+        \tableofcontents
+    \end{multicols}
+\end{frame}
+
+%% ---------------------------------------------------------------------------
+% --- Slide de Introdução ---
+\section{Introdução}
+\begin{frame}{Junção na Álgebra Relacional}
+    \begin{itemize}
+        \item Operação fundamental para combinar informações de múltiplas relações.
+        \item Diferente do Produto Cartesiano, utiliza condições para filtrar combinações relevantes.
+        \begin {itemize}
+            \item Faz-se primeiro um produto cartesiano e depois uma seleção conforme os dados necessários
+        \end {itemize}
+        \item Baseia-se em atributos relacionados (chaves estrangeiras e primárias).
+        \item Essencial para a recuperação de dados complexos em bancos relacionais.
+    \end{itemize}
+\end{frame}
+%% ---------------------------------------------------------------------------
+% --- Junções internas  ---
+\section{Junções Internas}
+\begin{frame}{Junção Theta ($\bowtie_\theta$)}
+    \begin{itemize}
+        \item \textbf{Definição}: Forma mais geral de junção. Combina tuplas que satisfazem um predicado $\theta$.
+        \item \textbf{Predicado $\theta$}: Operadores de comparação ($=, <, >, \leq, \geq, \neq$).
+        \item \textbf{Notação}: $R \bowtie_\theta S = \sigma_\theta(R \times S)$.
+    \end{itemize}
+    \begin{block}{Exemplo}
+        \texttt{Empregado} $\bowtie_{\text{ID\_Emp} > \text{ID\_Dept}}$ \texttt{Departamento}
+    \end{block}
+\end{frame}
+
+% --- Equijoin ---
+\begin{frame}{Junção de Igualdade (Equijoin)}
+    \begin{itemize}
+        \item Caso especial da Junção Theta onde $\theta$ usa apenas o operador de igualdade ($=$).
+        \item Mantém todas as colunas de ambas as relações (gera colunas duplicadas).
+    \end{itemize}
+    \begin{block}{Exemplo}
+        \texttt{Empregado} $\bowtie_{\text{E.Cdep} = \text{D.Código}}$ \texttt{Departamento}
+    \end{block}
+\end{frame}
+
+% --- Junção Natural ---
+\begin{frame}{Junção Natural ($\bowtie$)}
+    \begin{itemize}
+        \item Realizada sobre atributos com o mesmo nome em ambas as relações.
+        \item \textbf{Diferencial}: Elimina automaticamente as colunas duplicadas.
+        \item Notação: $R \bowtie S$.
+    \end{itemize}
+    \begin{block}{Exemplo}
+        \texttt{Empregado} $\bowtie$ \texttt{Departamento}
+    \end{block}
+\end{frame}
+
+
+%% ---------------------------------------------------------------------------
+%% Junção externa
+
+\section{Junções Externas}
+
+\begin{frame}{Junção Externa à Esquerda (Left Outer Join)}
+    \begin{itemize}
+        \item \textbf{Notação}: $R \rtimes S$
+        \item \textbf{Funcionamento}: Preserva todas as tuplas da relação à esquerda ($R$).
+        \item \textbf{Correspondência}: Se não houver par em $S$, os atributos de $S$ são preenchidos com \textbf{NULL}.
+        \item \textbf{Uso}: Quando a tabela da esquerda é a entidade principal da consulta.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Junção Externa à Direita (Right Outer Join)}
+    \begin{itemize}
+        \item \textbf{Notação}: $R \ltimes S$
+        \item \textbf{Funcionamento}: Preserva todas as tuplas da relação à direita ($S$).
+        \item \textbf{Correspondência}: Se não houver par em $R$, os atributos de $R$ são preenchidos com \textbf{NULL}.
+        \item \textbf{Uso}: Inverso do Left Join; garante a integridade dos dados da tabela à direita.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Junção Externa Completa (Full Outer Join)}
+    \begin{itemize}
+        \item \textbf{Notação}: $R \Join S$ % Símbolo padrão de junção
+        \item \textbf{Funcionamento}: Preserva todas as tuplas de ambas as relações ($R$ e $S$).
+        \item \textbf{Correspondência}: Preenche com \textbf{NULL} em qualquer lado que falte a correspondência.
+        \item \textbf{Uso}: Para obter uma visão total de dados relacionados, sem perder registros de nenhum lado.
+    \end{itemize}
+\end{frame}
+
+
+\section{Junções Avançadas}
+\begin{frame}{Semi-Junção e Anti-Junção}
+    \begin{block}{Semi-Junção ($\ltimes$)}
+        Retorna tuplas de $R$ que possuem correspondência em $S$, mas sem os atributos de $S$.
+        \[ R \ltimes_\theta S = \Pi_{\text{Atributos}(R)}(R \bowtie_\theta S) \]
+    \end{block}
+    \begin{block}{Anti-Junção ($\triangleright$)}
+        Retorna tuplas de $R$ que \textbf{não} possuem correspondência em $S$.
+        \[ R \triangleright S \]
+    \end{block}
+\end{frame}
+
+%% ---------------------------------------------------------------------------
+\section{Resumo Geral}
+
+\begin{frame}{Resumo das Operações de Junção}
+    \vspace{0.2cm}
+    \footnotesize
+    \centering
+    \renewcommand{\arraystretch}{2} % Aumenta o espaçamento entre as linhas para ficar menos "apertado"
+    \setlength{\tabcolsep}{10pt}      % Aumenta o espaço entre as colunas
+    
+    \begin{tabularx}{\textwidth}{l c l} % O 'X' diz: "use todo o espaço que sobrar"
+    \textbf{Operação} & \textbf{Notação} & \textbf{Aplicação Prática} \\
+    \hline
+        \textbf{Theta / Equi} & $R \bowtie_{\theta} S$ & Combinação por critérios lógicos ou igualdade. \\
+        
+        \textbf{Natural} & $R \bowtie S$ & Junção automática por nomes iguais e únicos. \\
+        
+        \textbf{Left Join} & $R \rtimes S$ & Preserva todos os dados da tabela à  \textbf{esquerda}. \\
+        
+        \textbf{Right Join} & $R \ltimes S$ & Preserva todos os dados da tabela à \textbf{direita}. \\
+        
+        \textbf{Full Join} & $R \Join S$ & Preserva todos os dados de \textbf{ambos os lados}. \\
+        
+        \textbf{Semi-Join} & $R \ltimes_{\theta} S$ & Filtra registros que \textbf{possuem} correspondência. \\
+        
+        \textbf{Anti-Join} & $R \triangleright S$ & Filtra registros que \textbf{não possuem} correspondência. \\
+        \hline
+    \end{tabularx}
+
+    \vspace{0.5cm}
+    \begin{flushleft}
+        \scriptsize
+        \textbf{Dica:} Use Junções \textbf{Internas} para dados exatos e \textbf{Externas} para evitar perda de registros órfãos.
+    \end{flushleft}
+\end{frame}
+
+
+\end{document}

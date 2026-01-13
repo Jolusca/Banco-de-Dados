@@ -202,6 +202,23 @@ ORDER BY freq_data;
 -- a matrícula do empregado, o ano e o mês. Este procedimento deve atualizar o valor
 -- do banco de horas neste mês para o empregado em questão.
 
+CREATE OR REPLACE FUNCTION lista06.questao25(
+	v_matricula INTEGER,
+	v_ano INTEGER,
+	v_mes INTEGER,
+	v_total_horas NUMERIC
+)
+returns VOID
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	UPDATE lista06.banco_horas
+	SET ban_total_horas = v_total_horas
+	WHERE emp_matricula = v_matricula AND
+	ban_ano = v_ano AND
+	ban_mes = v_mes;
+END;
+$$;
 
 -- 2.6. Crie uma stored procedure que receba como parâmetro de entrada dois parâmetros
 -- (smallint) o ano e o mês. Este procedimento deve atualizar o valor do banco de
